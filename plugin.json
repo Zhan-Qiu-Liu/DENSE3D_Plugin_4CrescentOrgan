@@ -1,9 +1,9 @@
 {
-	"package": "dense3D_plugin_4crescentorgan",
+	"package": "DENSE3D_Plugin_4CrescentOrgan",
 	"version": "0.1.0",
 	"description": "DENSEanalysis affiliate plugin for analyzing 3D Cine DENSE MRI data of a crescent-shaped organ",
 	"name": "3D DENSE Analysis for Crescent Organ",
 	"author": "Zhanqiu Liu",
 	"email": "lafeir.lew@gmail.com",
-	"url": "https:\/\/github.com\/MMoTH\/dense3D_plugin_4crescentorgan"
+	"url": "https:\/\/github.com\/MMoTH\/DENSE3D_Plugin_4CrescentOrgan"
 }

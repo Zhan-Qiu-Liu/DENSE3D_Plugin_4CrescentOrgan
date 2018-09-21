@@ -24,7 +24,7 @@ Compatible with [v0.5.0](https://github.com/denseanalysis/denseanalysis/blob/mas
 After installation of [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) and the biventricular branch of [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular), run the following from the MATLAB command line:
 
 ```matlab
-plugins.PluginManager.import('https://github.com/MMoTH/dense3D_plugin_4crescentorgan')
+plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentOrgan')
 ```
 
 ## Credits
