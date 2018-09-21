@@ -29,7 +29,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 
 ## Credits
 * This package was created with the [*denseanalysis_plugin_demo*](https://github.com/denseanalysis/denseanalysis_plugin_demo) project template.
-* Matlab scripts [`wrapMesh.m`], [`circumferentialParameterize.m`],  and [`computeStrains.m`] are modified from the [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular) project.
+* Matlab scripts [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  and [`computeStrains.m`](computeStrains.m) are modified from the [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular) project.
 
 ## Known Bugs
 
