@@ -7,7 +7,7 @@
 
 ## Features
 * Iteration Method for Adjusting the Finite Element Mesh into its Actual Crescent Shape
-* Precise Segmentation of Right Ventricular Free Wall from Left Ventricular Free Wall (by taking the fact into account that the anterior and inferior insertions of the RV to the LV vary along the ventricular long axis)
+* Precise Segmentation of Right Ventricular Free Wall from Left Ventricular Free Wall (by taking the fact into account that the anterior and inferior insertions of the RV to the LV shift circumferentially along the ventricular long axis)
 * A Graphical User Interface for User-defined Noise Suppression
 * A Graphical User Interface for Selecting the Finite Elements of Interest and Visualizing their Deforamtion 
 
