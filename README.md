@@ -6,10 +6,10 @@
 - The heart in which the biventricular shape is sharper at the right ventricle insertion points
 
 ## Features
-* Iteration Algorithm for Adjusting the Finite Element Mesh into its Actual Crescent Shape
-* Insertion Tissue Resection
+* Iteration Method for Adjusting the Finite Element Mesh into its Actual Crescent Shape
+* Precise Segmentation of Right Ventricular Free Wall from Left Ventricular Free Wall (by taking the fact into account that the anterior and inferior insertions of the RV to the LV vary along the ventricular long axis)
 * A Graphical User Interface for User-defined Noise Suppression
-* A Graphical User Interface for Visualizing the Deforamtion of Finite Elements of Interest
+* A Graphical User Interface for Selecting the Finite Elements of Interest and Visualizing their Deforamtion 
 
 ## Requirements
 - [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) 
