@@ -40,7 +40,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			%% Add menu items
 			Parent = findall(handles.hfig, 'tag', 'menu_file');
 			Parent = get(Parent, 'Parent');
-			self.handles.menu_append = uimenu('Parent', Parent, 'Label', 'Plugin_DENSE3D4Rodent');
+			self.handles.menu_append = uimenu('Parent', Parent, 'Label', 'Plugin_DENSE3D4CrescentOrgan');
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Initialize DENSE3DPlugin4CrescentOrgan', 'Callback', @(s,e)self.initGUI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Delete the Pre-defined Slice of Interest', 'Callback', @(s,e)self.deleteSOI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Auto-build:SA RVendo(LVendo+epi required)', 'Callback', @(s,e)XformDNS_LV2BV(true,fullfile(get(handles.config,'locations.matpath',userdir()),get(handles.config, 'locations.matfile',userdir())),self),'Accelerator','B');%'DENSEanalysis workspace v0.4->v0.5'
@@ -819,7 +819,7 @@ end
 		end
 
 		function genRVendoMesh(self)
-		% Small animals (rodent, ect) usually have crescent-shaped RV cavity
+		% Small animals (rodent, ect) usually have a much more crescent-shaped RV cavity
 		% Handpick a good seed point where a small sphere will be placed
 		% the location of the small sphere is not obtained by just taking the mean of the supplied contour points.
 		%
