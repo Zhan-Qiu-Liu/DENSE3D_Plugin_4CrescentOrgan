@@ -13,7 +13,7 @@
 
 ## Requirements
 - [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) 
-	- The core software
+	- The core software for 2D contouring
 - The biventricular branch of [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular)
 	- Call for the scripts under the private directory inside it
 
@@ -27,9 +27,13 @@ After installation of [*DENSEanalysis*](https://github.com/denseanalysis/densean
 plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentOrgan')
 ```
 
+>**NOTE**: For analysis only, click once `Initialize DENSE3DPlugin4CrescentOrgan` under the menu tab `Plugin_DENSE3D4CrescentOrgan` every time [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) is ran.
+
 ## Credits
-* This package was created with the [*denseanalysis_plugin_demo*](https://github.com/denseanalysis/denseanalysis_plugin_demo) project template.
-* Matlab scripts [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  and [`computeStrains.m`](computeStrains.m) are modified from the [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular) project.
+- This package was created with the [*denseanalysis_plugin_demo*](https://github.com/denseanalysis/denseanalysis_plugin_demo) project template.
+- Copyright (c) of the following scripts belongs to 2016 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors:
+	- Modified Matlab scripts [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  [`computeStrains.m`](computeStrains.m), [`analysisFcnREPL.m`](analysisFcnREPL.m), [`spl2strainFcnREPL.m`](spl2strainFcnREPL.m), [`exportMatREPL.m`](exportMatREPL.m), and [`MeshControl.m`](MeshControl.m)
+	- Orignial Matlab scripts [`contourDataREPL.m`](contourDataREPL.m), [`computeTransmuralDataREPL.m`](computeTransmuralDataREPL.m), [`resetFcnREPL.m`](resetFcnREPL.m), and [`switchstateREPL.m`](switchstateREPL.m)
 
 ## Known Bugs
 

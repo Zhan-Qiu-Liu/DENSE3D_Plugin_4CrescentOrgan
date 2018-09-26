@@ -6,24 +6,31 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 	% 
 	% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 	% Last Modified: 11:54 July 19, 2017
-    %{ 
+    
 	properties (Constant)
-		FOI = 'SeedPoints.m';
-		% FOI = {'surfacemesh.m','Generate_Mesh.m','Fit_Surface.m','Psi.m','Adjust_Mesh_Mex.*','*.mat'};
+        BackgroundColor = [.78 .93 .8];%eye-protected
+		% FOI = 'SeedPoints.m';%  {'surfacemesh.m','Generate_Mesh.m','Fit_Surface.m','Psi.m','Adjust_Mesh_Mex.*','*.mat'};
     end
-	 %}
+	
     properties
         handles
 		Handles
+		
+		%% 2D DENSE:
+		dns = struct([]);
+		% dns = struct('SegPos_idx',[],'SegPos',[]);
+        status = struct('SOI',[],'nSA',[],'nLA',[]);
+        % SPLINE information
+        spl = repmat(struct,[0 1]);
+		straindata = [];
+
+		%% 3D DENSE:
 		hShowMesh = [];
 		hPickSlice = [];
 		viewerObj
 		dataObj
 		configObj
-		
-        BackgroundColor = [.78 .93 .8];%eye-protected
-
-		end
+	end
 	
     methods
 
@@ -35,52 +42,44 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
             handles = guidata(self.hfig(1));
 			% viewer = get(handles.hsidebar.CurrentPanel, 'UserData');
 
-			%% BEHAVIOR@VIEWER---------------------------------------------
-
+			%%VIEWER---------------------------------------------
 			%% Add menu items
-			Parent = findall(handles.hfig, 'tag', 'menu_file');
-			Parent = get(Parent, 'Parent');
-			self.handles.menu_append = uimenu('Parent', Parent, 'Label', 'Plugin_DENSE3D4CrescentOrgan');
+			parent = findall(handles.hfig, 'tag', 'menu_file');
+			parent = get(parent, 'Parent');
+			self.handles.menu_append = uimenu('Parent', parent, 'Label', 'Plugin_DENSE3D4CrescentOrgan');
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Initialize DENSE3DPlugin4CrescentOrgan', 'Callback', @(s,e)self.initGUI());
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Check 2D computed Contours', 'Tag','menu_chk2Dcontours','Callback', @(s,e)chk2DcomputedContours(self));
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Delete the Pre-defined Slice of Interest', 'Callback', @(s,e)self.deleteSOI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Auto-build:SA RVendo(LVendo+epi required)', 'Callback', @(s,e)XformDNS_LV2BV(true,fullfile(get(handles.config,'locations.matpath',userdir()),get(handles.config, 'locations.matfile',userdir())),self),'Accelerator','B');%'DENSEanalysis workspace v0.4->v0.5'
 
-			return
-			
-			%{ 
-			% Need to update? Check version!
-			tmp = dir(self.InstallDir); files = {tmp.name}; files = files([tmp.isdir] == 0);  idx = strwcmpi(files,'*.version'); [~,files] = fileparts(files{idx});
-            Configuration(fullfile(self.InstallDir,[self.Version,'.version']));
-			if strwcmpi(files,self.Version)
-			 %}
-			
-
-
 			%% Remap for all click events
-            set(findobj(self.hShowMesh.fig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self,handles));
-            set(findobj(self.hShowMesh.fig, 'tag', 'menu_open'), 'Callback', @(s,e)loadFcnREPL(self, handles));
-            set(findobj(self.hShowMesh.fig, 'tag', 'tool_open'), 'ClickedCallback', @(s,e)loadFcnREPL(self, handles));
-            set(findobj(self.hShowMesh.fig, 'tag', 'menu_save'), 'Callback', @(s,e,x)saveFcnREPL(self,handles,false));
-            set(findobj(self.hShowMesh.fig, 'tag', 'tool_save'), 'ClickedCallback', @(s,e,x)saveFcnREPL(self,handles,false));
-			set(findobj(self.hShowMesh.fig, 'tag', 'menu_saveas'), 'Callback', @(s,e,x)saveFcnREPL(self,handles,true));
-			%{ 
-			%% Add menu items
-			% load without selection GUI
-			parent = findall(self.hShowMesh.fig, 'tag', 'menu_analysis');
-			self.Handles.menu_setSOI = uimenu('Parent', parent, 'Label', 'Set SOI', 'Tag','menu_setSOI','Callback', @(s,e)setSOI(self,handles));
+            set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
+            set(findobj(handles.hfig, 'tag', 'menu_open'), 'Callback', @(s,e)loadFcnREPL(self));
+            set(findobj(handles.hfig, 'tag', 'tool_open'), 'ClickedCallback', @(s,e)loadFcnREPL(self));
+            set(findobj(handles.hfig, 'tag', 'menu_save'), 'Callback', @(s,e,x)saveFcnREPL(self,false));
+            set(findobj(handles.hfig, 'tag', 'tool_save'), 'ClickedCallback', @(s,e,x)saveFcnREPL(self,false));
+			set(findobj(handles.hfig, 'tag', 'menu_saveas'), 'Callback', @(s,e,x)saveFcnREPL(self,true));
 			
-			parent = get(findall(self.hShowMesh.fig, 'tag', 'menu_file'), 'Parent');
-			self.Handles.menu_append = uimenu('Parent', parent, 'Label', 'Plugin_DENSE3D_RV');
+			%% Add menu items
+			%{ 
+			% load without selection GUI
+			parent = findall(handles.hfig, 'tag', 'menu_analysis');
+			self.handles.menu_chk2Dcontours = uimenu('Parent', parent, 'Label', 'Check 2D computed Contours', 'Tag','menu_chk2Dcontours','Callback', @(s,e)chk2DcomputedContours(self));
+			self.handles.menu_setSOI = uimenu('Parent', parent, 'Label', 'Set SOI', 'Tag','menu_setSOI','Callback', @(s,e)setSOI(self,handles));
+			
+			parent = get(findall(handles.hfig, 'tag', 'menu_file'), 'Parent');
+			self.handles.menu_append = uimenu('Parent', parent, 'Label', 'Plugin_DENSE3D_LV');
 			% @(s)XformDNS_LV2BV(true): Too many input arguments.
-			uimenu('Parent', self.Handles.menu_append, 'Label', 'DENSEanalysis workspace v0.4->v0.5', 'Callback', @(s,e)XformDNS_LV2BV(true));
-			% uimenu('Parent', self.Handles.menu_append, 'Label', 'Summary of Hotkeys', 'Callback', @HotkeysSummary);
-			% uimenu('Parent', self.Handles.menu_append, 'Label', 'Known Bugs and Issues', 'Callback', @ReadMe);
+			uimenu('Parent', self.handles.menu_append, 'Label', 'DENSEanalysis workspace v0.4->v0.5', 'Callback', @(s,e)XformDNS_LV2BV(true));
+			% uimenu('Parent', self.handles.menu_append, 'Label', 'Summary of Hotkeys', 'Callback', @HotkeysSummary);
+			% uimenu('Parent', self.handles.menu_append, 'Label', 'Known Bugs and Issues', 'Callback', @ReadMe);
 			 %}
+			
 			%% Add toolbar items
 			%{ 
 			cdata = load(fullfile(self.InstallDir,'icons.mat'),'-mat');
-			htoolbar = get(findall(self.hShowMesh.fig, 'tag', 'tool_open'));
-			self.Handles.tool_saveas = uipushtool(...
+			htoolbar = get(findall(handles.hfig, 'tag', 'tool_open'));
+			self.handles.tool_saveas = uipushtool(...
 			'Parent',htoolbar,...
 			'Separator',        'on', ...
 			'ClickedCallback',@(s,e,x)saveFcnREPL(self,handles,true),...
@@ -91,18 +90,24 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			'Tag','tool_saveas');
 			
 			% link some menu enable to tool enable
-			setappdata(self.Handles.tool_saveas,'linkMenuToolEnable',linkprop([self.Handles.tool_saveas,self.Handles.menu_saveas],'Enable'))
+			setappdata(self.handles.tool_saveas,'linkMenuToolEnable',linkprop([self.handles.tool_saveas,self.handles.menu_saveas],'Enable'))
+			 %}
+
+			return
+			
+			%{ 
+			% Need to update? Check version!
+			tmp = dir(self.InstallDir); files = {tmp.name}; files = files([tmp.isdir] == 0);  idx = strwcmpi(files,'*.version'); [~,files] = fileparts(files{idx});
+            Configuration(fullfile(self.InstallDir,[self.Version,'.version']));
+			if strwcmpi(files,self.Version)
 			 %}
 			
-			return
-						
-			
-			self.Handles.tool_DataCursor = uitoolfactory(htoolbar,'Exploration.DataCursor');
-			set(self.Handles.tool_DataCursor,'Separator','on','TooltipString','Data Cursor(Alt+D)');
-			self.Handles.tool_reload = uipushtool(...
+			self.handles.tool_DataCursor = uitoolfactory(htoolbar,'Exploration.DataCursor');
+			set(self.handles.tool_DataCursor,'Separator','on','TooltipString','Data Cursor(Alt+D)');
+			self.handles.tool_reload = uipushtool(...
 			'Parent',htoolbar,...
 			'Separator',        'on', ...
-			'ClickedCallback',@(s,e)reloadFcn(handles),...
+			'ClickedCallback',@(s,e)reloadFcn(self),...
 			'CData',cdata.tool_reload,...
 			'TooltipString','Reload Workspace(Ctrl+R)',...
 			'Tag','tool_reload');
@@ -137,7 +142,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 				'menu_exportexcel',       'X', ...
 				'menu_exportroi',        'R', ...
 				'menu_test', 'T');
-			func = @(x,y)set(findobj(self.hShowMesh.fig, 'tag', x), 'Accelerator', y);
+			func = @(x,y)set(findobj(handles.hfig, 'tag', x), 'Accelerator', y);
 			cellfun(func, fieldnames(accelerators), struct2cell(accelerators));
 			
         end
@@ -150,30 +155,47 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
             h = [];		
         end
 
-%{ 
-		
-        function refresh(self)
-            hlist = self.Handles.hlist;
+        function chk2DcomputedContours(self)
+			if isempty(self.straindata)
+				self.menu_runanalysis_REPL;
+			else
+				import plugins.dense3D_plugin_4crescentorgan.*
+				opts = MeshControl(self.straindata);
+				drawnow
+				if isempty(opts); return; end
+				tags = fieldnames(opts);
+				for ti = 1:numel(tags)
+					self.straindata.(tags{ti}) = opts.(tags{ti});
+				end				
+			end
+		end
 
-            if isempty(self.hdense.Data)
-                newstrs = {};
-                val = 0;
-            else
-                newstrs = {self.hdense.Data.Description};
+		%{ 
+        function setSOI(self)
+					
+			% tmp = [];
+			% while isempty(tmp)
+				% tmp = inputdlg('Slices of Interest(enter Space/Comma(,)/Semicolon(;)-separated numbers):');
+				% tmp = str2num(tmp{:});
+			% end
+			tmp = {NaN};		
+			while any(isnan(tmp{:}))
+				tmp = inputdlg(strcat('Current Slices of Interest(SOI): [',num2str(self.status.SOI),']. [enter Comma(,)/Semicolon(;)-separated slice numbers to reset] (EG: if slicce name is "xyz: auto.1", then slice number is "1")'),'Set SOI');
+				if isempty(tmp)
+					tmp = {self.status.SOI};
+				else
+					tmp = regexpi(tmp,',|;','split'); tmp = cellfun(@str2double,tmp,'UniformOutput',false);
+				end
+			end
+			% if isempty(tmp) || any(isnan(tmp{:}))
+				% h = errordlg(errstr,'','modal');
+				% waitfor(h);
+			% else
+				self.status.SOI = tmp{1};
+			% end
+		end
+		 %}
 
-                apexind = self.hdense.apicalSlice();
-                [~, baseind] = self.hdense.basalSlice();
-
-                % Add the [base] and [apex] indicators
-                newstrs{baseind} = [newstrs{1}, ' [base]'];
-                newstrs{apexind} = [newstrs{end}, ' [apex]'];
-
-                val = min(numel(newstrs), get(hlist, 'value'));
-            end
-
-            set(hlist, 'String', newstrs, 'Value', max([val,1]));
-        end
- %}
         function self = initGUI(self)
 		
 			if isfield(self.Handles,'hShowMesh')
@@ -324,6 +346,9 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			self.Handles.hShowMesh = options(BOI);
 			set(options(BOI),'Callback',@(s,e)showMesh(handles));
 			 %}
+			
+			% tmp = cellfun(@(x)regexpi(x,'\w*3d*'),handles.hsidebar.TabNames,'UniformOutput',false);
+			handles.hsidebar.ActiveTab = handles.hsidebar.NumberOfTabs;
         end
 
 		function deleteSOI(self)
@@ -356,71 +381,20 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			end
         end
 		
-%{ 
-        function activateUI(self, hdata)
-            % Make sure that the 3D rotation tool is turned on
-            activateUI@plugins.DENSEanalysisPlugin(self, hdata);
-
-            % Store the state of all tools
-            self.guistate.Enable = get(hdata.htools, 'Enable');
-
-            tags = {'Exploration.Rotate3d'
-                    'Exploration.Pan'
-                    'Exploration.ZoomOut'
-                    'ZoomIn'};
-
-            % Disable everything by default
-            set(hdata.htools, 'Enable', 'off')
-            set(hdata.hfig, 'Colormap', bwr)
-
-            for k = 1:numel(tags)
-                set(findobj(hdata.htools, 'tag', tags{k}), 'Enable', 'on')
-            end
-        end
-
-        function deactivateUI(self, hdata)
-            deactivateUI@plugins.DENSEanalysisPlugin(self, hdata);
-
-            if ~isempty(self.guistate)
-                set(hdata.htools, {'Enable'}, self.guistate.Enable)
-            end
-        end
-
-        function addCallback(self)
-            key = 'Location.LoadWorkspace';
-            pth = get(self.Config, key, pwd);
-
-            if ~exist(pth, 'dir')
-                pth = pwd;
-            end
-
-            uipath = self.hdense.addData(pth);
-
-            if ~isempty(uipath)
-                set(self.Config, key, uipath);
-            end
-        end
-
-        function removeCallback(self)
-            val = get(self.Handles.hlist, 'Value');
-            if val <= numel(self.hdense.Data)
-                self.hdense.Data(val) = [];
-            end
-        end
- %}
-
 		function validate(varargin)
             % validate - Check if the plugin can run.
             %
             %   Performs validation to ensure that the state of the program
             %   is correct to be able to run the plugin.
             %
+			%   When the user clicks on your "plugin" menu item within the DENSEanalysis GUI and your validate method doesn't produce an error,
+			%   the DENSEdata object will automatically be passed to your plugin's run method.
+            %
             % USAGE:
-            %   DENSE3DPlugin4CrescentOrgan.validate(data)
+            %   DENSE3DPluginLV.validate(data)
             %
             % INPUTS:
-            %   data:   Object, DENSEdata object containing all underlying
-            %           data from the DENSEanalysis program.
+            %   data:   Object, DENSEdata object containing all series, images, ROI, and spline information from the DENSEanalysis program.
         end
 
         function run(varargin)
@@ -434,7 +408,264 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
             %   data:   Object, DENSEdata object containing all underlying
             %           data from the DENSEanalysis program.
         end
-	
+
+		% function getParentHandles(self)
+            % self.hParent = guidata(self.hfig(1));
+        % end
+		
+		function loadFcnREPL(self)
+		% Copyright (c) 2016 DENSEanalysis Contributors
+		% Last Modified: 13:12 July 28, 2017
+		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+			import plugins.dense3D_plugin_4crescentorgan.*
+			
+            handles = guidata(self.hfig(1));
+			% proper startpath
+			startpath = get(handles.config, 'locations.matpath', userdir());
+
+			% try to load new data
+			try
+				[uipath,uifile] = load(handles.hdata,'dns',startpath);
+			catch ERR
+				uipath = [];
+				errstr = ERR.message;
+				h = errordlg(errstr,'','modal');
+				ERR.getReport()
+				waitfor(h);
+			end
+			if isempty(uipath), return; end
+
+			% save path to figure
+			set(handles.config, 'locations.matpath', uipath)
+			set(handles.config, 'locations.matfile', uifile)
+			
+			[~,f,~] = fileparts(uifile);
+			% set(handles.config, 'locations.dnsname', f)
+
+			guidata(handles.hfig,handles);
+
+			% figure name
+			set(handles.hfig,'Name',['DENSEanalysis: ' f]);
+
+			% update figure
+			resetFcnREPL(handles.hfig);
+			
+			% load beyond DENSEdata:
+			fields = {'dns','status'};
+			tmp = load(fullfile(uipath,uifile), fields{:}, '-mat');
+			self.dns = tmp.dns;
+			fields = {'SOI','nSA','nLA'};
+			if isfield(tmp,'status')
+				self.status = tmp.status;
+				idx = find(~isfield(self.status,fields(:)))';
+			else
+				idx = 1:numel(fields);
+			end
+			for ii = idx; self.status.(fields{ii}) = []; end
+			
+			if ~isfield(self.dns, 'SegPos')
+				[self.dns.SegPos] = deal([]);	
+				% [self.dns(1:self.status.nSA).SegPos] = deal([]);	
+			end
+			if ~isfield(self.dns, 'meshCtrl')
+				[self.dns.meshCtrl] = deal([]);	
+			end
+
+		end
+
+		function reloadFcn(self)
+			import plugins.dense3D_plugin_4crescentorgan.*
+			
+            handles = guidata(self.hfig(1));
+			if isempty(handles.hdata)
+				return
+			end
+			
+			% proper startpath
+			startpath = fullfile(get(handles.config, 'locations.matpath', userdir()),get(handles.config, 'locations.matfile', userdir()));
+
+			% try to load new data
+			try
+				[uipath,uifile] = load(handles.hdata,'dns',startpath);
+			catch ERR
+				uipath = [];
+				errstr = ERR.message;
+				h = errordlg(errstr,'','modal');
+				ERR.getReport()
+				waitfor(h);
+			end
+			if isempty(uipath), return; end
+			
+			% update figure
+			resetFcnREPL(handles.hfig);
+			
+			% load beyond DENSEdata:
+			fields = {'dns','status'};
+			tmp = load(fullfile(uipath,uifile), fields{:}, '-mat');
+			self.dns = tmp.dns;
+			fields = {'SOI','nSA','nLA'};
+			if isfield(tmp,'status')
+				self.status = tmp.status;
+				idx = find(~isfield(self.status,fields(:)))';
+			else
+				idx = 1:numel(fields);
+			end
+			for ii = idx; self.status.(fields{ii}) = []; end
+
+		end
+
+		function saveFcnREPL(self,flag_saveas)
+		% Copyright (c) 2016 DENSEanalysis Contributors
+		% Last Modified: 13:12 July 28, 2017
+		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+
+            handles = guidata(self.hfig(1));
+			defaultpath = get(handles.config, 'locations.matpath', '');
+			defaultfile = get(handles.config, 'locations.matfile', '');
+			file = save(handles.hdata, defaultpath, defaultfile, flag_saveas);
+			if isempty(file)
+				return
+			else
+				[p,f,e] = fileparts(file);
+				set(handles.config, 'locations.matpath', p);
+				set(handles.config, 'locations.matfile', [f, e]);
+				set(handles.hfig, 'Name', ['DENSEanalysis: ' f]);
+			end
+			
+			% save to file beyond DENSEdata:
+			tmp = load(file, '-mat');
+			seq = tmp.seq;
+			img = tmp.img;
+			roi = tmp.roi;
+			if isempty(self.dns)
+				dns = tmp.dns;
+			else
+				dns = self.dns;
+			end
+			% if isempty(self.status.SOI)
+				% save(file,'seq','img','dns','roi');
+			% else
+				status = self.status;
+				save(file,'seq','img','dns','roi','status');
+			% end
+			
+		end
+
+		function menu_runanalysis_REPL(self)
+			import plugins.dense3D_plugin_4crescentorgan.*
+
+            handles = guidata(self.hfig(1));
+			didx = handles.hdense.DENSEIndex;
+			ridx = handles.hdense.ROIIndex;
+			frame = handles.hdense.Frame;
+			% self.hdata = handles.hdata;
+			
+			% self.spl = handles.hdata.analysis(didx,ridx,frame);
+			analysisFcnREPL(self,handles.hdata,didx,ridx,frame);
+			if isempty(self.spl), return; end
+			%{ 
+			if isempty(self.status.nSA)
+				for k = 1:numel(handles.hdata.dns)
+					tmp = handles.hdata.seq(handles.hdata.dns(k).MagIndex(1)).DENSEanalysisName;
+					if ~isempty(strfind(tmp, 'SA'))
+						self.status.nSA = self.status.nSA + 1;
+					elseif ~isempty(strfind(tmp, 'LA'))
+						self.status.nLA = self.status.nLA + 1;
+					else
+						msgbox('Invalid Input #',sprintf('%d',k),': ',sprintf('%s',tmp),'. Cannot recognize the type for SA or LA.');
+					end
+				end
+			end
+			 %}
+
+			%{ 
+			if mod(self.status.nSA,2) == 0
+				if didx == self.status.nSA/2 || didx == self.status.nSA/2+1 
+					self.dns(didx).SegPos = handles.hanalysis.straindata.PositionB;
+				if ~isempty(self.dns(self.status.nSA/2).SegPos) && ~isempty(self.dns(self.status.nSA/2+1).SegPos)
+					handles.hanalysis.straindata.PositionB(1,:) = mean([self.dns(self.status.nSA/2).SegPos(1,:);self.dns(self.status.nSA/2+1).SegPos(1,:)],1);		
+					handles.hanalysis.straindata.PositionB(2,:) = mean([self.dns(self.status.nSA/2).SegPos(2,:);self.dns(self.status.nSA/2+1).SegPos(2,:)],1);
+					self.dns([1:self.status.nSA/2-1,self.status.nSA/2+2:self.status.nSA]).SegPos = handles.hanalysis.straindata.PositionB;
+				end
+				end
+			elseif didx == round(self.status.nSA/2)
+				self.dns(didx).SegPos = handles.hanalysis.straindata.PositionB;
+				if didx <= self.status.nSA
+					self.dns([1:didx-1,didx+1:self.status.nSA]).SegPos = handles.hanalysis.straindata.PositionB;
+				end
+			end
+			 %}
+			%{  
+			if isempty(self.status.SOI)
+				setSOI(self);
+			end
+			if any(didx==self.status.SOI)
+			 %}
+				exportpath = get(handles.config, 'export.mat.location', '');
+				if ~isa(handles.hanalysis, 'DataViewer')
+					return;
+				end	
+				% file = handles.hanalysis.exportMat(exportpath);
+
+				% determine strain object
+				data = spl2strainFcnREPL(self,didx);%,handles
+				if isempty(data)
+					return;
+				else
+					self.straindata = data;
+					% save to *.dns
+					self.dns(didx).SegPos = data.PositionB;
+					self.dns(didx).meshCtrl = data.meshCtrl;		
+					
+					file = exportMatREPL(self,handles,exportpath);
+					% save to file beyond DENSEdata:
+					%{ 
+					defaultpath = get(handles.config, 'export.mat.location', '');
+					handles.hanalysis.exportMat(self, defaultpath);
+					defaultpath = get(handles.config, 'export.mat.location', '');
+					defaultfile = get(handles.config, 'export.mat.file', '');
+					file = fullfile(defaultpath, defaultfile);
+					tmp = load(file, '-mat');
+					tmp.AnalysisInfo.Nseg = self.straindata.Nseg;
+					 %}
+				end
+				if isempty(file)
+				% if isempty(handles.hanalysis.straindata)
+					return;
+				end
+				handles.config.export.mat.location = fileparts(file);
+
+				%{ 
+				% self.dns(didx).SegPos = handles.hanalysis.straindata.PositionB;
+				self.dns(didx).SegPos = self.straindata.PositionB;
+				% self.dns.SegPos_idx(end+1) = didx;
+				% self.dns.SegPos(end+1,:) = handles.hanalysis.straindata.PositionB;
+				tmp = {self.dns(self.status.SOI).SegPos};
+				if ~any(cellfun(@isempty,tmp))
+					% tmp1 = []; tmp2 =[];
+					% for k = 1:numel(self.status.SOI)
+						% tmp1 = [tmp1;tmp{k}(1,:)];
+						% tmp2 = [tmp2;tmp{k}(2,:)];
+					% end
+					% handles.hanalysis.straindata.PositionB(1,:) = mean(tmp1,1);
+					% handles.hanalysis.straindata.PositionB(2,:) = mean(tmp2,1);
+					self.straindata.PositionB = mean(vertcat(tmp{:}),1);
+					% handles.hanalysis.straindata.PositionB = mean(vertcat(tmp{:}),1);
+					ind = 1:self.status.nSA; ind(self.status.SOI) = [];
+					[self.dns(ind).SegPos] = deal(self.straindata.PositionB);
+					% [self.dns(ind).SegPos] = deal(handles.hanalysis.straindata.PositionB);
+				else
+					msgbox('Next, build the mesh for the second Slice of Interest.');			
+				end
+			elseif isempty(self.dns(didx).SegPos)
+			% elseif ~sum(self.dns.SegPos_idx == didx)
+				msgbox('This slice is NOT the Slices of Interest (SOI). First, build the mesh for the SOI. Later, re-build the mesh for this slice again!');
+			end
+			 %}
+			
+			% handles.hsidebar.ActiveTab = 3;
+		end
+		
 		function showMesh(self)
 		% work in STATIC WORKSPACE: variables in the main function retain
 			
