@@ -2,7 +2,7 @@ function [file, out] = exportMatREPL(self,obj,startpath)
 % Copyright (c) 2016 DENSEanalysis Contributors
 % The codes below are modified from the function "exportMatFcn" in "AnalysisViewer.m".
 
-	import plugins.dense3D_plugin_4crescentorgan.*
+	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 %{ 
     % determine strain object
     if isempty(self.straindata)

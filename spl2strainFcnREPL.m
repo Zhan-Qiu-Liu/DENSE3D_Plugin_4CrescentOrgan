@@ -51,7 +51,7 @@ function data = spl2strainFcnREPL(self,didx)%,obj
             % api.Clockwise = self.straindata.Clockwise;
         % end
 		
-		import plugins.dense3D_plugin_4crescentorgan.*
+		import plugins.DENSE3D_Plugin_4CrescentOrgan.*
         opts = MeshControl(api);
         drawnow
         if isempty(opts); data = []; return; end

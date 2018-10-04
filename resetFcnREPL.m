@@ -4,7 +4,7 @@ function handles = resetFcnREPL(hfig)
 % this function ensures the state of the GUI matches the data loaded into
 % the DENSEdata object (handles.hdata)
 
-	import plugins.dense3D_plugin_4crescentorgan.*
+	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 	
     % gather gui data
     handles = guidata(hfig);

@@ -4,7 +4,7 @@ function analysisFcnREPL(self,obj,didx,ridx,seedframe,varargin)
 % Last Modified: 22:28 July 28, 2017
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
-	import plugins.dense3D_plugin_4crescentorgan.*
+	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 	
 %% ANALYSIS FUNCTION
 	% gather data

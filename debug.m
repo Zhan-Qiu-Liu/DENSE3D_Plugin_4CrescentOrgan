@@ -62,8 +62,8 @@ unless you try a new value for sigma.
 > In eigs>checkInputs/LUfactorAminusSigmaB at 995
   In eigs>checkInputs at 806
   In eigs at 93
-  In +dense3D_plugin_4crescentorgan\private\biharmonic_embedding at 42
-  In +dense3D_plugin_4crescentorgan\private\longitudinalParameterization at 23
+  In +DENSE3D_Plugin_4CrescentOrgan\private\biharmonic_embedding at 42
+  In +DENSE3D_Plugin_4CrescentOrgan\private\longitudinalParameterization at 23
   In DENSE3DPlugin4CrescentOrgan>DENSE3DPlugin4CrescentOrgan.pickSlice at 1045
   In DENSE3DPlugin4CrescentOrgan>@(s,e)pickSlice(self)
 sprank(U)%rank
@@ -73,8 +73,8 @@ RCOND =  5.551115e-17.
 > In eigs>AminusSigmaBsolve at 1210
   In eigs>@(v)AminusSigmaBsolve(Bmtimes(v)) at 149
   In eigs at 261
-  In +dense3D_plugin_4crescentorgan\private\biharmonic_embedding at 42
-  In +dense3D_plugin_4crescentorgan\private\longitudinalParameterization at 23
+  In +DENSE3D_Plugin_4CrescentOrgan\private\biharmonic_embedding at 42
+  In +DENSE3D_Plugin_4CrescentOrgan\private\longitudinalParameterization at 23
   In DENSE3DPlugin4CrescentOrgan>DENSE3DPlugin4CrescentOrgan.pickSlice at 1045
   In DENSE3DPlugin4CrescentOrgan>@(s,e)pickSlice(self)
 4.594095772844915e-08
@@ -104,7 +104,7 @@ v(v<1e-7) = eps;
 
 				idxEndo = 1;
 				zeros(0,2)
-				import plugins.dense3D_plugin_4crescentorgan.*
+				import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 				cdata = RVlongitudinalParameterization(self.dataObj.EndocardialMesh(idxEndo).vertices, self.dataObj.EndocardialMesh(idxEndo).faces, self.dataObj.Apex(idxEndo,:));
 				ans(end+1,1)=numel(find(abs(cdata-.99) < .01));
 				ans(end+1,2)=numel(find(abs(cdata-.01) < .01));
