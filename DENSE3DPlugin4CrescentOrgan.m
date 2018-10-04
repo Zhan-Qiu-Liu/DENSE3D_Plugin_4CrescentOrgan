@@ -17,6 +17,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		Handles
 		
 		%% 2D DENSE:
+		aside = [];
 		dns = struct([]);
 		% dns = struct('SegPos_idx',[],'SegPos',[]);
         status = struct('SOI',[],'nSA',[],'nLA',[]);
@@ -36,6 +37,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 
         function self = DENSE3DPlugin4CrescentOrgan(varargin)
 
+			import plugins.dense3D_plugin_4crescentorgan.*
 			% load plugin config: plugin.json file
             self@plugins.DENSEanalysisPlugin(varargin{:});
 						

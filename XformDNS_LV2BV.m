@@ -133,6 +133,17 @@ function XformDNS_LV2BV(button,config,self)
 		end		
 	end
 	
+	if ~isempty(button)
+		hwait = waitbartimer();
+		cleanupObj = onCleanup(@(x)delete(hwait(isvalid(hwait))));
+		hwait.String = 'Converting Contours...';
+		hwait.WindowStyle = 'modal';
+		hwait.AllowClose = false;
+		hwait.Visible = 'on';
+		hwait.start;
+		drawnow
+	end
+
 	%% Setting of distance of Endo-RV-insertPT away from Epi-RV-insertPT in LA view:
 	self.aside.LA = 1;
 	
