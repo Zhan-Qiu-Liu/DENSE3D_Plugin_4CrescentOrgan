@@ -337,32 +337,56 @@ function XformDNS_LV2BV(button,config,self)
 					%}
 
 					%% Insert 2 Pts near the 2 RVinsertPts into LVepi
-					LVepi = roi(jj).Position{kk,1};
+					tmp = circshift(LVepiInterp,-(idx_AntInsPt-1+clcDir*SegPos));
+					% tmp(1,:): LVepiInterp(idx_AntInsPt+clcDir*SegPos,:)
+					for ll = {InsertPt, tmp(1,:)}
+						LVepi = roi(ROI).Position{kk,1};
+						tmp = bsxfun(@minus,LVepi,ll{:});
+						[~,tmp] = sort(sum(tmp.^2,2),'ascend');
+						idx_NearInsPt = min(tmp([1 2]))+1;
+						idx_NearInterpInsPt = dsearchn(LVepiInterp,LVepi(tmp([1 2]),:));
+						
+						nPt = length(LVepi)+1;
+						tmp = [1:nPt]; tmp(idx_NearInsPt) = [];
+						roi(ROI).Position{kk,1} = nan(nPt,2);
+						roi(ROI).Position{kk,1}(tmp,:) = LVepi;
+						roi(ROI).Position{kk,1}(idx_NearInsPt,:) = LVepiInterp(round(mean(idx_NearInterpInsPt)),:);
+					end
+					
+					% Added point & RVinsertPt could be the different side:
+					%{ 
 					tmp = bsxfun(@minus,LVepi,InsertPt);
 					[~,idx_NearAntInsPt] = min(sum(tmp.^2,2));
 					tmp = bsxfun(@minus,LVepiInterp,LVepi(idx_NearAntInsPt,:));
 					[~,idx_NearInterpAntInsPt1] = min(sum(tmp.^2,2));
-					tmp = bsxfun(@minus,LVepiInterp,LVepi(idx_NearAntInsPt+clcDir,:));
+					% tmp(1,:): LVepi(idx_NearAntInsPt+clcDir,:)
+					tmp = circshift(LVepi,-(idx_NearAntInsPt-1-1));
+					tmp = bsxfun(@minus,LVepiInterp,tmp(1,:));
 					[~,idx_NearInterpAntInsPt2] = min(sum(tmp.^2,2));
 					
-					tmp = bsxfun(@minus,LVepi,LVepiInterp(idx_AntInsPt+clcDir*SegPos,:));
+					tmp = circshift(LVepiInterp,-(idx_AntInsPt-1+clcDir*SegPos));
+					tmp = bsxfun(@minus,LVepi,tmp(1,:));
 					[~,idx_NearPosInsPt] = min(sum(tmp.^2,2));
 					tmp = bsxfun(@minus,LVepiInterp,LVepi(idx_NearPosInsPt,:));
 					[~,idx_NearInterpPosInsPt1] = min(sum(tmp.^2,2));
-					tmp = bsxfun(@minus,LVepiInterp,LVepi(idx_NearPosInsPt-clcDir,:));
+					% tmp(1,:): LVepi(idx_NearPosInsPt-clcDir,:)
+					tmp = circshift(LVepi,-(idx_NearPosInsPt-1+1));
+					tmp = bsxfun(@minus,LVepiInterp,tmp(1,:));
 					[~,idx_NearInterpPosInsPt2] = min(sum(tmp.^2,2));
 					
 					if clcDir == -1
-						idx_insertPt = [idx_NearAntInsPt+1,idx_NearPosInsPt+1];
+						idx_NearInsPt = [idx_NearAntInsPt+1,idx_NearPosInsPt+1];
 					else
-						idx_insertPt = [idx_NearAntInsPt+2,idx_NearPosInsPt];
+						idx_NearInsPt = [idx_NearAntInsPt+2,idx_NearPosInsPt];
 					end
-					nPt = length(LVepi)+length(idx_insertPt);
+					
+					nPt = length(LVepi)+length(idx_NearInsPt);
 					tmp = [1:nPt];
-					tmp(idx_insertPt) = [];
+					tmp(idx_NearInsPt) = [];
 					roi(ROI).Position{kk,1} = nan(nPt,2);
 					roi(ROI).Position{kk,1}(tmp,:) = LVepi;
-					roi(ROI).Position{kk,1}(idx_insertPt,:) = [LVepiInterp(round((idx_NearInterpAntInsPt1+idx_NearInterpAntInsPt2)/2),:);LVepiInterp(round((idx_NearInterpPosInsPt1+idx_NearInterpPosInsPt2)/2),:)];
+					roi(ROI).Position{kk,1}(idx_NearInsPt,:) = [LVepiInterp(round((idx_NearInterpAntInsPt1+idx_NearInterpAntInsPt2)/2),:);LVepiInterp(round((idx_NearInterpPosInsPt1+idx_NearInterpPosInsPt2)/2),:)];
+					 %}
 					
 					%% Generate RVendo:
 					% Shift array circularly but fail to reverse the order

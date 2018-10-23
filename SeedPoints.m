@@ -35,6 +35,7 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 			final_nor_R = 1.1 % [mm]
 			initial_tan_R = .1 % [mm]
 			final_tan_R = .5 % [mm]
+			frame = 10;
 			%% dataset 20150628
 			% initial_nor_R = .4 % [mm]
 			% final_nor_R = .8 % [mm]
@@ -46,24 +47,35 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 			final_nor_R = .6 % [mm]
 			initial_tan_R = .3 % [mm]
 			final_tan_R = .3 % [mm]				
+			frame = 11;
+		case '20150830'%% dataset 20150830
+			center = [9.7667 5.7960 -3.0269];
+			initial_nor_R = .3 % [mm]
+			final_nor_R = .8 % [mm]
+			initial_tan_R = .2 % [mm]
+			final_tan_R = .4 % [mm]				
+			frame = 11;
 		case '20150913'%% dataset 20150913
 			center = [-2.698042507113268,11.490590391752633,-4.684133112167247];
 			initial_nor_R = .6 % [mm]
 			final_nor_R = .8 % [mm]
 			initial_tan_R = .2 % [mm]
 			final_tan_R = .5 % [mm]
+			frame = 10;
 		case '20151008'
 			center = [5.3413 7.4723 1.7974];
 			initial_nor_R = .3 % [mm]
 			final_nor_R = .8 % [mm]
 			initial_tan_R = .3 % [mm]
 			final_tan_R = .3 % [mm]
+			frame = 11;
 		case '20151018'%%  Late Systolic
 			center = [11.2793 5.6288 8.7150];
 			initial_nor_R = .2 % [mm]
 			final_nor_R = .6 % [mm]
 			initial_tan_R = .3 % [mm]
 			final_tan_R = .3 % [mm]
+			frame = 11;
 		% case '20151018'%% Early Systolic
 			% center = [11.2793 5.6288 8.7150];
 			% initial_nor_R = .2 % [mm]
@@ -76,6 +88,7 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 			final_nor_R = .9; % [mm]
 			initial_tan_R = .4; % [mm]
 			final_tan_R = .4; % [mm]
+			frame = 9;
 		% case '20151101'%% seeds:1+2+5+3+5+4
 			% center = [-1.1265 6.0892 -6.4609];
 			% initial_nor_R = .5; % [mm]
@@ -96,12 +109,14 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 			final_nor_R = .7; % [mm]
 			initial_tan_R = .2; % [mm]
 			final_tan_R = .2; % [mm]
+			% frame = ;
 		case '20151104'%% seeds:5+3+3+3+3+3
 			center = [2.9737 5.0854 -4.8901];
 			initial_nor_R = .4; % [mm]
 			final_nor_R = .6; % [mm]
 			initial_tan_R = .2; % [mm]
 			final_tan_R = .5; % [mm]
+			frame = 11;
 		end
 	end
 	

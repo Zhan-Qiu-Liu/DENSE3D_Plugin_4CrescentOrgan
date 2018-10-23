@@ -671,7 +671,6 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		
 		function showMesh(self)
 		% work in STATIC WORKSPACE: variables in the main function retain
-			
 			if isfield(self.hShowMesh,'fig')
 				figure(self.hShowMesh.fig);
 				return
@@ -701,6 +700,18 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			self.hShowMesh.rotmat = eye(3);
 			self.hShowMesh.center = [0 0 0];
 			
+			if isempty(self.dataObj.EpicardialMesh)
+				% Perform analysis
+				self.generateMeshes();
+			else
+				button = questdlg({'Previously Defined Meshes Detected!','Choose what you want to do with it'},'Warning','Delete','Display','Delete');
+				if strcmpi(button,'Delete')
+					self.dataObj.reset();
+					self.generateMeshes();
+				end
+			end
+			if isempty(self.dataObj.EndocardialMesh); return; end
+						
 			self.hShowMesh.fig = figure(...
 			'Name', 'Refine 3D Mesh | created by Liu', ...
 			'NumberTitle',   'off', ...
@@ -766,17 +777,6 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			% htitle = title(self.hShowMesh.ax, '3D Mesh', 'Color', color);
 			% hlegend = legend(self.hShowMesh.ax, {'3D Mesh'}, 'AutoUpdate', 'off', 'TextColor', color, 'EdgeColor', color);
 			% title(hlegend,'3D Mesh')
-
-			if isempty(self.dataObj.EpicardialMesh)
-				% Perform analysis
-				self.generateMeshes();
-			else
-				button = questdlg({'Previously Defined Meshes Detected!','Choose what you want to do with it'},'Warning','Delete','Display','Delete');
-				if strcmpi(button,'Delete')
-					self.dataObj.reset();
-					self.generateMeshes();
-				end
-			end
 
 			self.hShowMesh.center = mean(self.dataObj.EpicardialMesh.vertices, 1);
 			self.hShowMesh.rotmat = self.dataObj.rotationMatrix();
@@ -860,6 +860,8 @@ end
 				try rmfield(self.viewerObj.cache,'regionalStrain'); end
 				self.hPickSlice = [];
 				set(self.Handles.hPickSlice,'Value',0);
+				
+				try delete(findall(0,'type','figure','-and','tag','WaitbarTimer')); end
 			end
 
 			function playbackFcn()
@@ -1015,25 +1017,18 @@ end
 		end
 
 		function generateMeshes(self)
-			% Initialize waitbar timer
-			hwait = waitbartimer();
-			% Delete hwait ASA cleanupObj deleted: too costly
-			% cleanupObj = onCleanup(@(x)delete(hwait(isvalid(hwait))));
-			hwait.String = 'Rendering 3D Mesh...';
-			hwait.WindowStyle = 'modal';
-			hwait.AllowClose = false;
-            hwait.Visible = 'on';
-			hwait.start;
-			drawnow
-
-			% Generate the surface meshes for the endo- and epicardial
-			% contours
-			self.dataObj.EpicardialMesh = surfacemesh(cat(1, self.hShowMesh.rois{:,1}));
-			self.dataObj.EndocardialMesh = surfacemesh(cat(1, self.hShowMesh.rois{:,2}));
-
+			% Generate the surface meshes for the endo- and epicardial contours
 			if self.hShowMesh.isBiv
 				self.genRVendoMesh();
 				% self.dataObj.EndocardialMesh(2) = surfacemesh(cat(1, self.hShowMesh.rois{:,3}), 1); % adjust = true;
+				if isempty(self.dataObj.EndocardialMesh); return; end
+			end
+			self.dataObj.EpicardialMesh = surfacemesh(cat(1, self.hShowMesh.rois{:,1}));
+			tmp = surfacemesh(cat(1, self.hShowMesh.rois{:,2}));
+			try
+				self.dataObj.EndocardialMesh = [tmp,self.dataObj.EndocardialMesh];
+			catch
+				self.dataObj.EndocardialMesh = [struct('faces', tmp.faces, 'vertices', tmp.vertices), struct('faces', self.dataObj.EndocardialMesh.faces, 'vertices',self.dataObj.EndocardialMesh.vertices)];
 			end
 
 			self.dataObj.Apex = self.dataObj.autoApex();
@@ -1048,8 +1043,6 @@ end
 			patch(self.dataObj.EndocardialMesh(2), 'FaceColor', 'w', 'FaceAlpha', 0.5);
 			 %}
 			 
-			%% remove waitbar timer
-			if exist('hwait','var'); hwait.stop; delete(hwait); end%delete(findall(0,'type','figure','-and','tag','WaitbarTimer'));
 		end
 
 		function genRVendoMesh(self)
@@ -1064,11 +1057,12 @@ end
 			% Use the up-to-dated Configuration file:
 			% settingfile = Configuration(fullfile(fileparts(which(class(self.dataObj))), 'settings.json'));
 			% Use the pre-loaded Configuration file:
-			[center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R] = SeedPoints(self.configObj);%settingfile
+			[center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,~,~,~,~,~,fname] = SeedPoints(self.configObj);%settingfile
 			
+			fExit = false;
 			%% pick a SeedPt
-			if isempty(initial_nor_R)
-				figure(...
+			if isempty(center)
+				hFig = figure(...
 				'Name', 'Handpick SeedPoint', ...
 				'NumberTitle',   'off', ...
 				'color', self.BackgroundColor, ...
@@ -1076,9 +1070,9 @@ end
 				'outerposition',[0 0 1 1],...
 				'renderer', 'opengl',...
 				'DockControls', 'off',...
+				'CloseRequestFcn',@(s,e)deleteFig(), ...
 				'MenuBar',       'none', ...
 				'Toolbar',       'figure');
-				% 'CloseRequestFcn',@(s,e)deleteFcn(), ...
 				% 'WindowKeyPressFcn', @windowkeypress, ...
 				hold on; axis equal; xlabel('x'); ylabel('y'); zlabel('z'); grid on;
 				center = mean(cat(1, self.hShowMesh.rois{:,3}), 1);
@@ -1100,12 +1094,13 @@ end
 				end
 				nor = cross(IOP(1:3),IOP(4:6));
 				tmp = 1/norm(nor); nor = nor * tmp;% sum(nor.^2)==1
+				nor = reshape(nor, 1, []);
 				view(nor);
 				
 				
 				button = uicontrol('Style','Pushbutton','String','Confirm Placement!','units','Normalized','Position',[0.01 0.01 0.1 0.05],'Callback',@(s,e)adjustMesh()) ;
 				
-				annotation('textbox',[0.7 .9 0.2 0.15],...
+				annotation('textbox',[0.7 .85 0.2 0.15],...
                 'Units', 'normalized',...
 				'EdgeColor', 'none',...
 				'FontSize', 8,...
@@ -1125,8 +1120,9 @@ end
 				% Update the projected Seedpoint with the new selection
 				addNewPositionCallback(h,@(pos) proj(pos));
 
+				set(self.Handles.hShowMesh,'Value',1);
 				% Click Button to resume execution of the MATLAB command line
-				waitfor(gcf, 'Name');
+				waitfor(hFig, 'Name');
 			end
 			
 			function CTR = proj(pos)
@@ -1143,11 +1139,29 @@ end
 					keyboard
 				else
 					center = proj(position)
-					set(gcbf,'Name',sprintf('Seedpoint (%1.0f,%1.0f,%1.0f) Selected for Dataset %s',center(:,1),center(:,2),center(:,3),fname));
+					set(hFig,'Name',sprintf('Seedpoint (%1.0f,%1.0f,%1.0f) Selected for Dataset %s',center(:,1),center(:,2),center(:,3),fname));
 					delete(h); delete(button);
 					drawnow
 				end
 			end
+
+			function deleteFig()
+				fExit = true;
+				delete(hFig);
+			end
+			
+			if fExit; return; end
+			% Initialize waitbar timer
+			hwait = waitbartimer();
+			% Delete hwait ASA cleanupObj deleted: too costly
+			% cleanupObj = onCleanup(@(x)delete(hwait(isvalid(hwait))));
+			hwait.String = 'Rendering 3D Mesh...';
+			hwait.WindowStyle = 'modal';
+			hwait.AllowClose = false;
+            hwait.Visible = 'on';
+			hwait.start;
+			drawnow
+			opts.WindowStyle = 'normal';
 
 			%% Initialize a RV endo mesh:
 			points = cat(1, self.hShowMesh.rois{:,3});
@@ -1168,8 +1182,9 @@ end
 			
 			meshes.faces = [mesh.tri_n1;mesh.tri_n2;mesh.tri_n3]';
 
-			%% Adjust the fitting parameters:
-			if isempty(initial_nor_R)
+		if isempty(initial_nor_R)
+			button = questdlg('Do you know the BEST VALUES for the fitting parameters: Initial Normal R & Final Normal R?','Iterative Calculation','No');
+			if strcmpi(button,'no')
 				while true
 					% wait just as a waitbar timer doese
 					tmp = inputdlg('Input a positive LOWER LIMIT for the distance from the mesh in the TANGENT direction:','Initial Tangent R',1,{'0.2'});
@@ -1200,32 +1215,38 @@ end
 						patch(meshes, 'FaceColor', 'w', 'FaceAlpha', 0.5);
 						% scatter3(points(:,1),points(:,2),points(:,3),3,'k','*');
 						for slice=1:size(self.hShowMesh.rois,1)
-							plot3(self.hShowMesh.rois{slice,k}(:,1),self.hShowMesh.rois{slice,k}(:,2),self.hShowMesh.rois{slice,k}(:,3),'LineWidth',1,'color', 'b');
+							plot3(self.hShowMesh.rois{slice,3}(:,1),self.hShowMesh.rois{slice,3}(:,2),self.hShowMesh.rois{slice,3}(:,3),'LineWidth',1,'color', 'b');
 						end
 					end
 				end
 				
 				h = msgbox({'Compare a series of fittings of generated RV endo meshes to the actual RV endo contours','Write down the best fitting parameters','Click any button when you are ready!'},'Find the best fitting');
 				waitfor(h);
-				while true
-					tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Normal R');
-					if isempty(tmp); continue; end;
-					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
-					if tmp > 0
-						initial_nor_R = tmp;
-						break
-					end		
-				end
-				while true
-					tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R');
-					if isempty(tmp); continue; end;
-					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
-					if tmp >= initial_nor_R
-						final_nor_R = tmp;
-						break
-					end		
-				end
+			end
+			
+			while true
+				tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Normal R',opts);
+				if isempty(tmp); continue; end;
+				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
+				if tmp > 0
+					initial_nor_R = tmp;
+					break
+				end		
+			end
+			while true
+				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R',opts);
+				if isempty(tmp); continue; end;
+				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
+				if tmp >= initial_nor_R
+					final_nor_R = tmp;
+					break
+				end		
+			end
+		end
 				
+		if isempty(initial_tan_R)
+			button = questdlg('Do you know the BEST VALUES for the fitting parameters: Initial Tangent R & Final Tangent R?','Iterative Calculation','No');
+			if strcmpi(button,'no')
 				for final_tan_R = 0.1:0.1:1
 					for initial_tan_R = 0.1:0.1:final_tan_R
 						meshes.vertices = Adjust_Mesh_Mex(mesh, points, iterations, [initial_smoothness_weight, final_smoothness_weight], [initial_points_weight, final_points_weight], [initial_nor_R, final_nor_R],  [initial_tan_R, final_tan_R]);
@@ -1236,41 +1257,48 @@ end
 						patch(meshes, 'FaceColor', 'w', 'FaceAlpha', 0.5);
 						% scatter3(points(:,1),points(:,2),points(:,3),3,'k','*');
 						for slice=1:size(self.hShowMesh.rois,1)
-							plot3(self.hShowMesh.rois{slice,k}(:,1),self.hShowMesh.rois{slice,k}(:,2),self.hShowMesh.rois{slice,k}(:,3),'LineWidth',1,'color', 'b');
+							plot3(self.hShowMesh.rois{slice,3}(:,1),self.hShowMesh.rois{slice,3}(:,2),self.hShowMesh.rois{slice,3}(:,3),'LineWidth',1,'color', 'b');
 						end
 					end
 				end
 
 				h = msgbox({'Compare a series of fittings of generated RV endo meshes to the actual RV endo contours','Write down the best fitting parameters','Click any button when you are ready!'},'Find the best fitting');
+				% wait until the object closes
 				waitfor(h);
-				while true
-					tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Normal R');
-					if isempty(tmp); continue; end;
-					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
-					if tmp > 0
-						initial_tan_R = tmp;
-						break
-					end		
-				end
-				while true
-					tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R');
-					if isempty(tmp); continue; end;
-					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
-					if tmp >= initial_tan_R
-						final_tan_R = tmp;
-						break
-					end		
-				end
 			end
+			
+			while true
+				tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Tangent R',1,{''},opts);
+				if isempty(tmp); continue; end;
+				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
+				if tmp > 0
+					initial_tan_R = tmp;
+					break
+				end		
+			end
+			while true
+				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Tangent R',opts);
+				if isempty(tmp); continue; end;
+				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
+				if tmp >= initial_tan_R
+					final_tan_R = tmp;
+					break
+				end		
+			end
+		end
 			
 			meshes.vertices = Adjust_Mesh_Mex(mesh, points, iterations, [initial_smoothness_weight, final_smoothness_weight], [initial_points_weight, final_points_weight], [initial_nor_R, final_nor_R],  [initial_tan_R, final_tan_R]);
 			
 			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
-			try
-				self.dataObj.EndocardialMesh(2) = wrapMesh(meshes);
-			catch
-				self.dataObj.EndocardialMesh(2) = struct('faces', meshes.faces, 'vertices', meshes.vertices);
-			end
+			self.dataObj.EndocardialMesh = struct('faces', [], 'vertices', []);
+			% try
+				self.dataObj.EndocardialMesh = wrapMesh(meshes);
+			% catch
+				% self.dataObj.EndocardialMesh(2) = struct('faces', meshes.faces, 'vertices', meshes.vertices);
+			% end
+			
+			%% remove waitbar timer
+			if exist('hwait','var'); hwait.stop; delete(hwait); end%delete(findall(0,'type','figure','-and','tag','WaitbarTimer'));
 		end
 		
 		function pickSlice(self)
