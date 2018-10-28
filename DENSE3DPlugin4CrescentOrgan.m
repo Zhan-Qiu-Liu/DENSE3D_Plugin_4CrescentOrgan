@@ -57,8 +57,10 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
-            set(findobj(handles.hfig, 'tag', 'menu_open'), 'Callback', @(s,e)loadFcnREPL(self));
-            set(findobj(handles.hfig, 'tag', 'tool_open'), 'ClickedCallback', @(s,e)loadFcnREPL(self));
+            set(findobj(handles.hfig, 'tag', 'menu_new'), 'Callback', @(s,e)loadFcnREPL(self,true));
+            set(findobj(handles.hfig, 'tag', 'tool_new'), 'ClickedCallback', @(s,e)loadFcnREPL(self,true));
+            set(findobj(handles.hfig, 'tag', 'menu_open'), 'Callback', @(s,e)loadFcnREPL(self,false));
+            set(findobj(handles.hfig, 'tag', 'tool_open'), 'ClickedCallback', @(s,e)loadFcnREPL(self,false));
             set(findobj(handles.hfig, 'tag', 'menu_save'), 'Callback', @(s,e,x)saveFcnREPL(self,false));
             set(findobj(handles.hfig, 'tag', 'tool_save'), 'ClickedCallback', @(s,e,x)saveFcnREPL(self,false));
 			set(findobj(handles.hfig, 'tag', 'menu_saveas'), 'Callback', @(s,e,x)saveFcnREPL(self,true));
@@ -416,19 +418,25 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
             % self.hParent = guidata(self.hfig(1));
         % end
 		
-		function loadFcnREPL(self)
+		function loadFcnREPL(self,flag_new)
 		% Copyright (c) 2016 DENSEanalysis Contributors
 		% Last Modified: 13:12 July 28, 2017
 		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 			
             handles = guidata(self.hfig(1));
-			% proper startpath
-			startpath = get(handles.config, 'locations.matpath', userdir());
+			% Get directory path by default:
+			if flag_new
+				type = 'dicom';
+				startpath = get(handles.config, 'locations.dicomfolder', userdir());
+			else
+				type = 'dns';
+				startpath = get(handles.config, 'locations.matpath', userdir());
+			end
 
 			% try to load new data
 			try
-				[uipath,uifile] = load(handles.hdata,'dns',startpath);
+				[uipath,uifile] = load(handles.hdata,type,startpath);
 			catch ERR
 				uipath = [];
 				errstr = ERR.message;
@@ -438,32 +446,75 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			end
 			if isempty(uipath), return; end
 
-			% save path to figure
-			set(handles.config, 'locations.matpath', uipath)
-			set(handles.config, 'locations.matfile', uifile)
-			
-			[~,f,~] = fileparts(uifile);
-			% set(handles.config, 'locations.dnsname', f)
+			% save path to configure
+			if flag_new
+				set(handles.config, 'locations.dicomfolder', uipath)
+				set(handles.config, 'locations.matfile', '')
+				f = 'new';			
+			else
+				set(handles.config, 'locations.matpath', uipath)
+				set(handles.config, 'locations.matfile', uifile)
+				[~,f,~] = fileparts(uifile);
+				% set(handles.config, 'locations.dnsname', f)
+			end
 
 			guidata(handles.hfig,handles);
-
 			% figure name
 			set(handles.hfig,'Name',['DENSEanalysis: ' f]);
-
 			% update figure
 			resetFcnREPL(handles.hfig);
 			
-			% load beyond DENSEdata:
-			fields = {'dns','status'};
-			tmp = load(fullfile(uipath,uifile), fields{:}, '-mat');
-			self.dns = tmp.dns;
+
+			%% Additional fields
 			fields = {'SOI','nSA','nLA'};
-			if isfield(tmp,'status')
-				self.status = tmp.status;
-				idx = find(~isfield(self.status,fields(:)))';
+			idx = 1:numel(fields);
+			if flag_new
+				self.dns = handles.hdata.dns;
+				
+				% create dns for non-DENSE sequences:
+				idxSeq = 1:numel(handles.hdata.seq);
+				tmp = unique([[handles.hdata.dns.MagIndex],[handles.hdata.dns.PhaIndex]]);
+				tmp(isnan(tmp)) = [];
+				idxSeq(tmp) = [];
+				newDNS = numel(handles.hdata.dns);
+				for ii = idxSeq
+					newDNS = newDNS+1;
+					self.dns(newDNS).UID = dicomuid;
+					self.dns(newDNS).MagIndex = repmat(ii,1,numel(self.dns(1).MagIndex));
+					self.dns(newDNS).PhaIndex = repmat(ii,1,numel(self.dns(1).PhaIndex));					
+					self.dns(newDNS).Number = handles.hdata.seq(ii).CardiacNumberOfImages;
+					self.dns(newDNS).PixelSpacing = handles.hdata.seq(ii).PixelSpacing;
+					self.dns(newDNS).Type = self.dns(1).Type;
+					self.dns(newDNS).Scale = self.dns(1).Scale;
+					self.dns(newDNS).EncFreq = self.dns(1).EncFreq;
+					self.dns(newDNS).SwapFlag = self.dns(1).SwapFlag;
+					self.dns(newDNS).NegFlag = self.dns(1).NegFlag;
+				end
+				
+				% change dns names:
+				for ii = 1:numel(self.dns)
+					self.dns(ii).Name = handles.hdata.seq(self.dns(ii).MagIndex(1)).DENSEanalysisName;
+				end
+				
+				% reload to make changes take effect:				
+				file = fullfile(pwd,'cache.tmp');
+				seq = handles.hdata.seq; img = handles.hdata.img; roi = handles.hdata.roi;
+				dns = self.dns;
+				save(file,'seq','img','dns','roi');
+				load(handles.hdata,'dns',file);
+				delete(file);
 			else
-				idx = 1:numel(fields);
+				tmp = {'dns','status'};
+				tmp = load(fullfile(uipath,uifile), tmp{:}, '-mat');
+				self.dns = tmp.dns;
+				
+				if isfield(tmp,'status')
+					self.status = tmp.status;
+					idx = find(~isfield(self.status,fields(:)))';
+				end
 			end
+			
+			% load data beyond DENSEdata:
 			for ii = idx; self.status.(fields{ii}) = []; end
 			
 			if ~isfield(self.dns, 'SegPos')
@@ -473,7 +524,6 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			if ~isfield(self.dns, 'meshCtrl')
 				[self.dns.meshCtrl] = deal([]);	
 			end
-
 		end
 
 		function reloadFcn(self)
@@ -535,16 +585,13 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 				set(handles.hfig, 'Name', ['DENSEanalysis: ' f]);
 			end
 			
-			% save to file beyond DENSEdata:
-			tmp = load(file, '-mat');
-			seq = tmp.seq;
-			img = tmp.img;
-			roi = tmp.roi;
-			if isempty(self.dns)
-				dns = tmp.dns;
-			else
+			%% save to file beyond DENSEdata:
+			tmp = load(file, '-mat'); seq = tmp.seq; img = tmp.img; roi = tmp.roi;
+			% if isempty(self.dns)
+				% dns = tmp.dns;
+			% else
 				dns = self.dns;
-			end
+			% end
 			% if isempty(self.status.SOI)
 				% save(file,'seq','img','dns','roi');
 			% else
@@ -575,7 +622,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 					elseif ~isempty(strfind(tmp, 'LA'))
 						self.status.nLA = self.status.nLA + 1;
 					else
-						msgbox('Invalid Input #',sprintf('%d',k),': ',sprintf('%s',tmp),'. Cannot recognize the type for SA or LA.');
+						msgbox(['Invalid Input #',sprintf('%d',k),': ',sprintf('%s',tmp),'. Cannot recognize the type for SA or LA.']);
 					end
 				end
 			end
@@ -1225,7 +1272,7 @@ end
 			end
 			
 			while true
-				tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Normal R',opts);
+				tmp = inputdlg('Choose the best LOWER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Initial Normal R',1,{''},opts);
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp > 0
@@ -1234,7 +1281,7 @@ end
 				end		
 			end
 			while true
-				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R',opts);
+				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R',1,{''},opts);
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp >= initial_nor_R
@@ -1277,7 +1324,7 @@ end
 				end		
 			end
 			while true
-				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Tangent R',opts);
+				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the TANGENT direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Tangent R',1,{''},opts);
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp >= initial_tan_R

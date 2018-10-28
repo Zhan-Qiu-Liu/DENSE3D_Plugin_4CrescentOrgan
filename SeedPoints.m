@@ -62,6 +62,13 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 			initial_tan_R = .2 % [mm]
 			final_tan_R = .5 % [mm]
 			frame = 10;
+		case '20150920'%% dataset 20150920
+			center = [ 3.4982   10.8276   -4.4754];
+			initial_nor_R = .5 % [mm]
+			final_nor_R = .7 % [mm]
+			initial_tan_R = .2 % [mm]
+			final_tan_R = .3 % [mm]
+			frame = 10;
 		case '20151008'
 			center = [5.3413 7.4723 1.7974];
 			initial_nor_R = .3 % [mm]

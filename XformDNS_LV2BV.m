@@ -411,7 +411,7 @@ function XformDNS_LV2BV(button,config,self)
 					RVendo(1,:) = LVepiInterp_ReOrd(1,:);
 					SegPos_new = SegPos - self.aside.ant + self.aside.pos;
 					if SegPos_new < 1
-						msgbox(['Wrong selections: Posterior-aside-distance ',self.aside.pos,'is too large in magnitude compared with ','Anterior-aside-distance ',self.aside.ant]);
+						msgbox(['Wrong selections: Posterior-aside-distance ',num2str(self.aside.pos),'is too large in magnitude compared with ','Anterior-aside-distance ',num2str(self.aside.ant)]);
 						return				
 					end
 					RVendo(nRVendoPt/2+1,:) = LVepiInterp_ReOrd(SegPos_new,:);
