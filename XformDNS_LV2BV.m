@@ -15,7 +15,7 @@ function XformDNS_LV2BV(button,config,self)
 % Last Modified: 17:38 June 14, 2017
 % Copyright (c) Zhanqiu Liu (lafeir.lew@gmail.com)
 
-	dbstop if error
+	% dbstop if error
 	
 	%% DIRECTORY LOAD: default inputs
 	homepath = char(java.lang.System.getProperty('user.home'));

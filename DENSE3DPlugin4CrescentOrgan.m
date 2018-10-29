@@ -49,6 +49,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			parent = findall(handles.hfig, 'tag', 'menu_file');
 			parent = get(parent, 'Parent');
 			self.handles.menu_append = uimenu('Parent', parent, 'Label', 'Plugin_DENSE3D4CrescentOrgan');
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Contour Interpolation', 'Callback', @(s,e)linearInterp(handles.hdata,handles.hdense.hroi), 'Accelerator', 'D');
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Run Analysis & Export DENSE3D Inputs', 'Callback', @(s,e)menu_runanalysis_REPL(self), 'Accelerator', 'A');%'Tag','menu_runanalysis',
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Check 2D computed Contours', 'Callback', @(s,e)chk2DcomputedContours(self));%'Tag','menu_chk2Dcontours',
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Initialize DENSE3DPlugin4CrescentOrgan', 'Callback', @(s,e)self.initGUI());
@@ -497,7 +498,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 				end
 				
 				% reload to make changes take effect:				
-				file = fullfile(pwd,'cache.tmp');
+				file = fullfile(pwd,'tmp.cache');
 				seq = handles.hdata.seq; img = handles.hdata.img; roi = handles.hdata.roi;
 				dns = self.dns;
 				save(file,'seq','img','dns','roi');
@@ -1238,7 +1239,7 @@ end
 					if isempty(tmp); continue; end;
 					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 					if tmp > 0
-						initial_tan_R = tmp;
+						initial_tan_R = tmp
 						break
 					end		
 				end
@@ -1247,7 +1248,7 @@ end
 					if isempty(tmp); continue; end;
 					tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 					if tmp >= initial_tan_R
-						final_tan_R = tmp;
+						final_tan_R = tmp
 						break
 					end		
 				end
@@ -1276,7 +1277,7 @@ end
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp > 0
-					initial_nor_R = tmp;
+					initial_nor_R = tmp
 					break
 				end		
 			end
@@ -1285,7 +1286,7 @@ end
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp >= initial_nor_R
-					final_nor_R = tmp;
+					final_nor_R = tmp
 					break
 				end		
 			end
@@ -1319,7 +1320,7 @@ end
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp > 0
-					initial_tan_R = tmp;
+					initial_tan_R = tmp
 					break
 				end		
 			end
@@ -1328,7 +1329,7 @@ end
 				if isempty(tmp); continue; end;
 				tmp = sscanf(sprintf('%s*', tmp{:}), '%f*');
 				if tmp >= initial_tan_R
-					final_tan_R = tmp;
+					final_tan_R = tmp
 					break
 				end		
 			end

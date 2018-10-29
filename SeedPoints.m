@@ -28,11 +28,18 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 	varargout
 	if exist('fname','var')	
 		switch lower(fname)
+		case '3'
+			center = [4.4079    1.2630    5.4883];
+			initial_nor_R = .3 % [mm]
+			final_nor_R = 1.1 % [mm]
+			initial_tan_R = .2 % [mm]
+			final_tan_R = .5 % [mm]
+			frame = 11;
 		case '20150628'%% dataset 20150628
 			center = [2.51346206948696	7.08576724017031	-3.12295877567370];
 			%% dataset 20150628discontinued
 			initial_nor_R = .3 % [mm]
-			final_nor_R = 1.1 % [mm]
+			final_nor_R = .8 % [mm]
 			initial_tan_R = .1 % [mm]
 			final_tan_R = .5 % [mm]
 			frame = 10;
