@@ -50,11 +50,12 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			parent = get(parent, 'Parent');
 			self.handles.menu_append = uimenu('Parent', parent, 'Label', 'Plugin_DENSE3D4CrescentOrgan');
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Contour Interpolation', 'Callback', @(s,e)linearInterp(handles.hdata,handles.hdense.hroi), 'Accelerator', 'D');
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Auto-build:SA RVendo(LVendo+epi required)', 'Callback', @(s,e)XformDNS_LV2BV(true,fullfile(get(handles.config,'locations.matpath',userdir()),get(handles.config, 'locations.matfile',userdir())),self),'Accelerator','B');%'DENSEanalysis workspace v0.4->v0.5'
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Run Analysis & Export DENSE3D Inputs', 'Callback', @(s,e)menu_runanalysis_REPL(self), 'Accelerator', 'A');%'Tag','menu_runanalysis',
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Check 2D computed Contours', 'Callback', @(s,e)chk2DcomputedContours(self));%'Tag','menu_chk2Dcontours',
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Initialize DENSE3DPlugin4CrescentOrgan', 'Callback', @(s,e)self.initGUI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Delete the Pre-defined Slice of Interest', 'Callback', @(s,e)self.deleteSOI());
-			uimenu('Parent', self.handles.menu_append, 'Label', 'Auto-build:SA RVendo(LVendo+epi required)', 'Callback', @(s,e)XformDNS_LV2BV(true,fullfile(get(handles.config,'locations.matpath',userdir()),get(handles.config, 'locations.matfile',userdir())),self),'Accelerator','B');%'DENSEanalysis workspace v0.4->v0.5'
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Export GIF Movie', 'Callback', @(s,e)self.saveGIF());
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
@@ -852,6 +853,8 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 					self.hShowMesh.hROIs(slice,k) = plot3(self.hShowMesh.ax,self.hShowMesh.ROIs{1}{slice,k}(:,1),self.hShowMesh.ROIs{1}{slice,k}(:,2),self.hShowMesh.ROIs{1}{slice,k}(:,3),'DisplayName', [names{k},' Contours'],'LineWidth',1,'color', 'y');
 				end
 			end
+			% Lighting
+			set(self.hShowMesh.hmeshes, 'FaceLighting', 'none', 'EdgeLighting', 'none', 'BackFaceLighting', 'unlit');
 % Test figure properites:
 %{ 
 figure
@@ -2270,6 +2273,63 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
             end
         end		
 		
+		function saveGIF(self)
+		% Last Modified: 23:03 June 29, 2018
+		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+			
+			if isempty(self.hShowMesh); return; end
+			
+			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+
+			hwait = waitbartimer();
+			cleanupObj = onCleanup(@(x)delete(hwait(isvalid(hwait))));
+			hwait.WindowStyle = 'modal';
+			hwait.AllowClose = false;
+            hwait.Visible = 'on';
+            hwait.String = 'Saving the movie...';
+			hwait.start;
+			drawnow
+			
+			[uifile, uipath, uipopup] = uiputfile({'*.gif','GIF movie(*.gif)'},'Select a path to save',pwd);
+			if ~uipopup; return; end
+
+			button = questdlg('Choose the type of face rendering:','Save GIF','Smooth','Silly Putty','Wire Frame','Smooth');%{,'(close this window to reset the viwer)'}
+			
+			% LnVis = get(self.hShowMesh.hROIs, 'Visible');
+			set(self.hShowMesh.hROIs, 'Visible', 'off');
+			% nSurfaces = numel(self.hShowMesh.meshes{1});
+			set(self.hShowMesh.fig, 'color', 'k');
+            switch lower(button)
+                case 'smooth'
+					set(self.hShowMesh.hmeshes, 'FaceLighting', 'gouraud', 'EdgeLighting', 'gouraud', 'BackFaceLighting', 'reverselit', 'AmbientStrength', .6);
+					set(self.hShowMesh.hmeshes(1), 'FaceColor', 'w', 'FaceAlpha', 0.5, 'EdgeColor', 'g', 'EdgeAlpha', 0.25);
+					set(self.hShowMesh.hmeshes(2), 'FaceColor', 'b', 'FaceAlpha', 0.75, 'EdgeColor', 'k', 'EdgeAlpha', 0.5);
+					try set(self.hShowMesh.hmeshes(3), 'FaceColor', 'r', 'FaceAlpha', 0.75, 'EdgeColor', 'k', 'EdgeAlpha', 0.5); end
+					light
+                case 'silly putty'
+					set(self.hShowMesh.hmeshes, 'FaceLighting', 'gouraud', 'EdgeLighting', 'gouraud', 'BackFaceLighting', 'reverselit', 'AmbientStrength', .6);
+					set(self.hShowMesh.hmeshes, 'FaceColor', [1 2/3 2/3], 'EdgeColor', 'none');
+					light
+                otherwise
+                % case 'wire frame'
+					set(self.hShowMesh.hmeshes, 'FaceLighting', 'flat', 'EdgeLighting', 'flat', 'BackFaceLighting', 'none');
+					set(self.hShowMesh.hmeshes, 'FaceColor', 'none', 'EdgeColor', 'w', 'EdgeAlpha', 0.1);
+            end
+
+			gif = animatedgif(fullfile(uipath,uifile), 'LoopCount', Inf, 'DelayTime', 0.1);
+			for k = 0:self.hShowMesh.hplaybar.Max
+				self.hShowMesh.hplaybar.Value = k;
+                gif.addFrame(getframe(self.hShowMesh.ax));
+            end
+			
+			%% reset the viewer
+			% tmp = arrayfun(@mat2cell,self.hShowMesh.hROIs);
+			% arrayfun(@(s,e)set(s, 'Visible', e), tmp{:}, LnVis{:})
+			delete(findobj(self.hShowMesh.ax, 'type', 'light'));
+			set(self.hShowMesh.fig, 'color', self.BackgroundColor);
+			set(self.hShowMesh.hmeshes, 'FaceLighting', 'none', 'EdgeLighting', 'none', 'BackFaceLighting', 'unlit', 'AmbientStrength', .3);
+			set(self.hShowMesh.hmeshes, 'FaceColor', 'w', 'FaceAlpha', 1, 'EdgeColor', 'k', 'EdgeAlpha', 1);
+		end
 		
     end
 	

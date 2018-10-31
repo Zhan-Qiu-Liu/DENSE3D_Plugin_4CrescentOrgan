@@ -34,7 +34,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 - Copyright (c) of the following improved Matlab scripts belongs to 2016 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors and Zhanqiu Liu <lafeir.lew@gmail.com>:
 	- [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  [`computeStrains.m`](computeStrains.m), [`analysisFcnREPL.m`](analysisFcnREPL.m), [`spl2strainFcnREPL.m`](spl2strainFcnREPL.m), [`exportMatREPL.m`](exportMatREPL.m), [`MeshControl.m`](MeshControl.m), and [`linearInterp.m`](linearInterp.m)
 - Copyright (c) of the following orignial Matlab scripts soley belongs to 2016 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors:
-	- [`contourDataREPL.m`](contourDataREPL.m), [`computeTransmuralDataREPL.m`](computeTransmuralDataREPL.m), [`resetFcnREPL.m`](resetFcnREPL.m), and [`switchstateREPL.m`](switchstateREPL.m)
+	- [`contourDataREPL.m`](contourDataREPL.m), [`computeTransmuralDataREPL.m`](computeTransmuralDataREPL.m), [`resetFcnREPL.m`](resetFcnREPL.m), [`switchstateREPL.m`](switchstateREPL.m), and [`animatedgif.m`](animatedgif.m)
 
 ## Known Bugs
 
