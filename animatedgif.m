@@ -1,4 +1,7 @@
 classdef animatedgif < hgsetget
+% Copyright (c) 2016 DENSEanalysis Contributors
+% The codes below are modified from the function "switchstate" in "DENSEanalysis.m".
+
     % animatedgif - Class for creating animated GIFs from images
     %
     %   Similar to the MATLAB builtin class for generating movies. This
