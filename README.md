@@ -13,9 +13,10 @@
 
 ### Requirements
 - [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) 
-	- The core software for 2D contouring
+	- The core software required for running the plugin
+	- Export 2D contours as inputs for the plugin 
 - The biventricular branch of [*DENSE3D Plugin*](https://github.com/suever/dense3D_plugin/tree/biventricular)
-	- Call for the scripts under the private directory inside it
+	- Call the scripts under the private directory inside it
 
 ### Compatibility
 Compatible with [v0.5.0](https://github.com/denseanalysis/denseanalysis/blob/master/CHANGELOG) of [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis)
