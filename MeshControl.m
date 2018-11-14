@@ -2,7 +2,7 @@ function options = MeshControl(varargin)
 % Copyright (c) 2016 DENSEanalysis Contributors
 % The codes below are modified from the script "segmentmodel.m".
 % Last Modified: 11:10 July 27, 2017
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
     errid = sprintf('%s:invalidInput',mfilename);
 

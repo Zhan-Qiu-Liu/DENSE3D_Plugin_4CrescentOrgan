@@ -42,8 +42,8 @@ function computeStrains(self, points)
 		strains.Locations = points(ind,:);	
 	end
 
-%% Copyright (c) of the following section of the codes: Zhanqiu Liu (lafeir.lew@gmail.com)
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+%% Copyright (c) of the following section of the codes: Zhan-Qiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 % Last Modified: 19:32 June 27, 2018				
 	self.dataObj.Strains = [];
 	try rmfield(self.hPickSlice, 'Strains'); end

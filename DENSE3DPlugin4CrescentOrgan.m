@@ -4,7 +4,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
     %   A plugin for analyzing 3D DENSE data in RV
     %
 	% 
-	% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+	% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 	% Last Modified: 11:54 July 19, 2017
     
 	properties (Constant)
@@ -423,7 +423,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		function loadFcnREPL(self,flag_new)
 		% Copyright (c) 2016 DENSEanalysis Contributors
 		% Last Modified: 13:12 July 28, 2017
-		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 			
             handles = guidata(self.hfig(1));
@@ -572,7 +572,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		function saveFcnREPL(self,flag_saveas)
 		% Copyright (c) 2016 DENSEanalysis Contributors
 		% Last Modified: 13:12 July 28, 2017
-		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
             handles = guidata(self.hfig(1));
 			defaultpath = get(handles.config, 'locations.matpath', '');
@@ -941,8 +941,8 @@ end
 
 					self.hShowMesh.meshes{self.hShowMesh.Frame} = self.dataObj.rotateMesh(M, self.hShowMesh.rotmat, self.hShowMesh.center);
 					
-			%% Copyright (c) of the following section of the codes: Zhanqiu Liu (lafeir.lew@gmail.com)
-			% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+			%% Copyright (c) of the following section of the codes: Zhan-Qiu Liu (lafeir.lew@gmail.com)
+			% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			% Last Modified: 19:32 June 27, 2018
 			% Debug Meshes in the current frame:
 					%% Drawn roi:
@@ -984,7 +984,7 @@ end
 			
 			function windowkeypress(~,evnt)
 			% Last Modified: 8:37 PM Friday, November 20, 2015
-			% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+			% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 				if isempty(evnt.Modifier)
 					key = evnt.Key;
 				else
@@ -1102,7 +1102,7 @@ end
 		% the location of the small sphere is not obtained by just taking the mean of the supplied contour points.
 		%
 		% Last Modified: 1:06 PM Thursday, October 15, 2015
-		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			
 			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 			% Use the up-to-dated Configuration file:
@@ -1354,7 +1354,7 @@ end
 		
 		function pickSlice(self)
 		% Last Modified: 23:03 June 29, 2018
-		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			
 			if isempty(self.hShowMesh)
 				self.showMesh();
@@ -2185,8 +2185,8 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 				% Positive distance is going to be anterior
 				side = sign(point2planeDistance([one; two], centers{1}, N));
 				
-				%% Copyright (c) of the following section of the codes: Zhanqiu Liu (lafeir.lew@gmail.com)
-				% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+				%% Copyright (c) of the following section of the codes: Zhan-Qiu Liu (lafeir.lew@gmail.com)
+				% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 				% Last Modified: 19:32 June 27, 2018				
 				tmp = {'INFERIOR', 'ANTERIOR'};
 				if  prod(side) > 0
@@ -2275,7 +2275,7 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 		
 		function saveGIF(self)
 		% Last Modified: 23:03 June 29, 2018
-		% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			
 			if isempty(self.hShowMesh); return; end
 			
@@ -2378,7 +2378,7 @@ end
 
 function deleteHandles(struc)
 % Last Modified: 17:28 August 7, 2018
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 	fields = fieldnames(struc);
 	ind = cellfun(@(x)ishandle(struc.(x)),fields,'UniformOutput',false);
 	ind = logical(cellfun(@(x)prod(x(:)),ind));
@@ -2387,7 +2387,7 @@ end
 
 function array = catField(structure, fieldName)
 % Last Modified: 17:28 August 7, 2018
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 	if size(structure(1).(fieldName),1) == 1
 		array = cat(1,structure.(fieldName));				
 	else

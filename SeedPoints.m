@@ -6,7 +6,7 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 	%               GUI. This provides access to all data and controls 
 	%               in the GUI.
 	% Last Modified: 12:34 July 12, 2018
-	% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+	% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
 	center = [];
 	initial_nor_R = []; % [mm]

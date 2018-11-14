@@ -2,11 +2,11 @@
 
 ### Creator ###
 ---
-* Zhanqiu Liu <lafeir.lew@gmail.com>
+* Zhan-Qiu Liu <lafeir.lew@gmail.com>
 
 ### Maintainer ###
 ---
-* Zhanqiu Liu <lafeir.lew@gmail.com>
+* Zhan-Qiu Liu <lafeir.lew@gmail.com>
 
 ### Contributors ###
 ---

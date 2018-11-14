@@ -13,7 +13,7 @@ function XformDNS_LV2BV(button,config,self)
 %   
 %
 % Last Modified: 17:38 June 14, 2017
-% Copyright (c) Zhanqiu Liu (lafeir.lew@gmail.com)
+% Copyright (c) Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
 	% dbstop if error
 	

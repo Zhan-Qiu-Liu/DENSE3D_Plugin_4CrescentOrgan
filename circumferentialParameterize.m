@@ -1,7 +1,7 @@
 function circumferentialParameterize(self, index)
 %% Copyright (c) 2016 DENSEanalysis Contributors
 % The codes below are modified from the function "parameterizeEndocardialMesh" in "DENSE3D.m".
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 % Last Modified: 19:32 June 27, 2018				
 
 %% Circumferential parameterization

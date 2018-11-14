@@ -1,5 +1,5 @@
 function points = intersectVerts(verts, faces, location, normal, ordered)
-% Later Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Later Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 % Last Modified: 17:28 August 7, 2018
 
 	% Find intersected points closed to the slice of interest

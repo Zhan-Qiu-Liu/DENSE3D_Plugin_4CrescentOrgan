@@ -32,7 +32,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 
 ### Credits
 - This package was created with the [*denseanalysis_plugin_demo*](https://github.com/denseanalysis/denseanalysis_plugin_demo) project template.
-- Copyright (c) of the following improved Matlab scripts belongs to [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors and [Zhanqiu Liu](mailto:lafeir.lew@gmail.com):
+- Copyright (c) of the following improved Matlab scripts belongs to [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors and [Zhan-Qiu Liu](mailto:lafeir.lew@gmail.com):
 	- [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  [`computeStrains.m`](computeStrains.m), [`analysisFcnREPL.m`](analysisFcnREPL.m), [`spl2strainFcnREPL.m`](spl2strainFcnREPL.m), [`exportMatREPL.m`](exportMatREPL.m), [`MeshControl.m`](MeshControl.m), and [`linearInterp.m`](linearInterp.m)
 - Copyright (c) of the following orignial Matlab scripts soley belongs to [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors:
 	- [`contourDataREPL.m`](contourDataREPL.m), [`computeTransmuralDataREPL.m`](computeTransmuralDataREPL.m), [`resetFcnREPL.m`](resetFcnREPL.m), [`switchstateREPL.m`](switchstateREPL.m), and [`animatedgif.m`](animatedgif.m)
@@ -41,7 +41,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 
 You are welcome to use the *DENSE3D_Plugin_4CrescentOrgan* in your research provided that you include the following citation in your work:
 
->Liu, Z.-Q.(2018). DENSE3D_Plugin_4CrescentOrgan. Retrieved
+>Zhan-Qiu Liu(2018). DENSE3D_Plugin_4CrescentOrgan. Retrieved
 >from https://github.com/MMoTH/DENSE3D_Plugin_4CrescentOrgan
 
 

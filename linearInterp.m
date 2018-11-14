@@ -2,7 +2,7 @@ function linearInterp(dataObj,roiObj)
 % Copyright (c) 2016 DENSEanalysis Contributors
 % The codes below are improved from the function "linearInterp" in "roitool.m".
 % It's much more versatile to all scenarios
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 % Last Modified: 22:06 October 28, 2018
 
 	% import plugins.DENSE3D_Plugin_4CrescentOrgan.*

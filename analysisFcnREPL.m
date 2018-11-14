@@ -2,7 +2,7 @@ function analysisFcnREPL(self,obj,didx,ridx,seedframe,varargin)
 % Copyright (c) 2016 DENSEanalysis Contributors
 % The codes below are modified from the function "analysisFcn" in "DENSEdata.m".
 % Last Modified: 22:28 July 28, 2017
-% Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
+% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
 	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 	
