@@ -40,7 +40,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 
 You are welcome to use the *DENSE3D_Plugin_4CrescentOrgan* in your research provided that you include the following citation in your work:
 
->Zhanqiu (2018). DENSE3D_Plugin_4CrescentOrgan. Retrieved
+>Liu, Z.-Q.(2018). DENSE3D_Plugin_4CrescentOrgan. Retrieved
 >from https://github.com/MMoTH/DENSE3D_Plugin_4CrescentOrgan
 
 
