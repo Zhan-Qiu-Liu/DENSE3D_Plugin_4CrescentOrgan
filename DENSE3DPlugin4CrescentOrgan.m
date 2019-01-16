@@ -654,6 +654,8 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			if any(didx==self.status.SOI)
 			 %}
 				exportpath = get(handles.config, 'export.mat.location', '');
+				if ~exist(exportpath, 'dir'); exportpath = pwd; end
+				
 				if ~isa(handles.hanalysis, 'DataViewer')
 					return;
 				end	
@@ -1255,6 +1257,7 @@ end
 						break
 					end		
 				end
+% savePath = get(self.configObj, 'Location.LoadWorkspace', pwd);
 				for final_nor_R = 0.1:0.1:1
 					for initial_nor_R = round(3*final_nor_R)/10:0.1:round(7*final_nor_R)/10
 						%% Debug Meshes in the current frame:
@@ -1268,6 +1271,9 @@ end
 						for slice=1:size(self.hShowMesh.rois,1)
 							plot3(self.hShowMesh.rois{slice,3}(:,1),self.hShowMesh.rois{slice,3}(:,2),self.hShowMesh.rois{slice,3}(:,3),'LineWidth',1,'color', 'b');
 						end
+% hgexport(gcf,fullfile(savePath,[num2str(gcf),sprintf('_%.1g',[initial_nor_R,final_nor_R]),'.jpg']),hgexport('factorystyle'), 'Format', 'jpeg');%prior to R2014b:get(gcf,'Number')
+% hgexport(gcf,fullfile(pwd,'1.jpg'),hgexport('factorystyle'), 'Format', 'jpeg');%prior to R2014b:get(gcf,'Number')
+
 					end
 				end
 				
