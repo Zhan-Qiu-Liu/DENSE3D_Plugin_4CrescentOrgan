@@ -24,7 +24,7 @@ function [center,initial_nor_R,final_nor_R,initial_tan_R,final_tan_R,frame,slice
 	[parentDir,fname] = fileparts(fname);
 	while isempty(fname); [parentDir,fname]=fileparts(parentDir); end
 	fname = regexp(fname,'\d*','Match');
-	if isempty(fname); return; end
+	if isempty(fname); fname = 'Undefined'; return; end	
 	if iscell(fname); fname = fname{:}; end;
 	varargout
 	if exist('fname','var')	
