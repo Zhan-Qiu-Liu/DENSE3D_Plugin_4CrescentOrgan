@@ -1427,7 +1427,7 @@ scatter3(points(:,1),points(:,2),points(:,3),5,'k','o');
 			[~,~,~,~,~,self.hShowMesh.frame,slice,ant,inf,tol,fname,parentDir] = SeedPoints(self.configObj);
 			if isempty(slice); slice=[.5, .167]; ant=0.01; inf=0.01; tol=0; self.hShowMesh.frame=round(mean(self.viewerObj.Frames)); end
 			% Avoid creating new object of playbar when callback: 
-			tmp= self.hShowMesh.hplaybar;
+			tmp = self.hShowMesh.hplaybar;
 			tmp.Value = self.hShowMesh.frame;
 			
 			self.hPickSlice.hText(1) = annotation(self.hShowMesh.fig,...
@@ -1612,11 +1612,11 @@ scatter3(points(:,1),points(:,2),points(:,3),5,'k','o');
 				'units', 'Normalized',...
 				'Position', [0.82 0.1 0.15 0.07],...
 				'Callback', @(s,e)pickCirLoc());
-			flds={'CC','LL'}; colors={'g','c'}; markers={'x','o'}; str = ' E';%positive  funcCirLoc={@CparamWTinsertion,@CparamWTinsertion,@returnTrue};
+			flds={'CC','LL'}; colors={'g','c','b','r','k','y','m'}; markers={'x','o','+','*','^','s','v','d','>','p','<'}; str = ' E';%positive  funcCirLoc={@CparamWTinsertion,@CparamWTinsertion,@returnTrue};
 			nFlds = numel(flds);
 			[strains,idxStrainAnt,idxVertsAnt,idxStrainInf,idxVertsInf,idxTol,locs,param] = deal([]);%,locations
 			set(self.hPickSlice.hEdit(3),'enable', 'on');
-			for k = 1:nEndo
+			for k = 1:nFlds
 				self.hPickSlice.hPts(k) = scatter3(self.hShowMesh.ax,[],[],[],10,colors{k},markers{k},'DisplayName',['Noises@',flds{k}]);
 			end
 
@@ -1754,13 +1754,16 @@ find(strains.Parameterization.Circumferential==1);
 					try ind = (pts>min(points)) & (pts<max(points)); end
 					set(self.hShowMesh.hmeshes(1), 'FaceColor', 'flat', 'FaceVertexCData', int8(ind));
 				end
-				
-				for k = 1:nEndo
+								
+				for k = 1:nFlds
 					ind = abs(param{k}-slice(1)) < slice(2);
 					points = locs{k}(ind,:);
 					set(self.hPickSlice.hPts(k),'XData',points(:,1),'YData',points(:,2),'ZData',points(:,3));
 					tmp = size(points,1);
-					set(self.hPickSlice.hDisplay(k),'String',[num2str(tmp),str,flds{k},' (marker: ',markers{k},')']);
+					% total number of strain pts:
+					ind = abs(strains.Parameterization.(paramName{idxParam})-slice(1)) < slice(2)&idxStrainAnt&idxStrainInf;
+					% rough estimate for margin of error(%)
+					set(self.hPickSlice.hDisplay(k),'String',[num2str(tmp),str,flds{k},' = ',sprintf('%.1f',tmp/(sum(ind)-tmp)*100),'% (marker: ',markers{k},')']);
 				end
 				
 				drawnow;
