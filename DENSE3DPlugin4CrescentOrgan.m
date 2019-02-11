@@ -1859,6 +1859,9 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				
 				% Add the folder plugins>dense3D_plugin into search path:
 				import plugins.dense3D_plugin.*
+				
+%%% regional heterogeneity of strain (circumferential (CURE), longitudinal (LURE), and radial (RURE) uniformity ratio estimates)
+% Bug: start from frame#0 or frame#1?
 				% Use the mean LV contraction as a reference for DelayTimes
 				tmp = self.dataObj.Strains(1).p2;
 				reference = mean(tmp, 1);
@@ -1959,11 +1962,20 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				output(idxEndo).Segmentation = segments;
 
 				self.viewerObj.cache.regionalStrain = output;
+%% NUMBER OF FRAME supported in 3D DENSE Analysis Viewer is self.hShowMesh.frame instead of self.hShowMesh.Frame(=self.hShowMesh.frame+1):
+				fields = fieldnames(output);
+				nFrames = self.hShowMesh.hplaybar.Max+1;
+				for k = 1:numel(fields)
+					if abs(size(output.(fields{k}),2)-nFrames) < 1
+						self.viewerObj.cache.regionalStrain.(fields{k})(:,1) = [];
+					end
+				end
+% In class 'plugins.dense3D_plugin.DENSE3Dviewer', no set method is defined for Dependent property 'Frames'.  A Dependent property needs a set method to assign its value:
+% self.viewerObj.Frames = nFrames;
 				
 				button = questdlg('Do you wanna save the result?','Yes');
 				if strcmpi(button,'Yes')				
-					fields = {'RR','CC','LL','CL'};
-					% fields = {'CL'};
+					fields = {'RR','CC','LL','CL','RC','RL','CL'};%,'CLShearAngle','CURE','RURE','LURE'
 					workbookNm =fullfile(parentDir,'RV_polar_strains_Baseline.xlsx');
 					for k = 1:numel(fields)
 						sheetNm = ['E',lower(fields{k})];
