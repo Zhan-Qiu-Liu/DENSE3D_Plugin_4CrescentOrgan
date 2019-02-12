@@ -1975,7 +1975,7 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				
 				button = questdlg('Do you wanna save the result?','Yes');
 				if strcmpi(button,'Yes')				
-					fields = {'RR','CC','LL','CL','RC','RL','CL'};%,'CLShearAngle','CURE','RURE','LURE'
+					fields = {'RR','CC','LL','CL','RC','RL'};%,'CLShearAngle','CURE','RURE','LURE'
 					workbookNm =fullfile(parentDir,'RV_polar_strains_Baseline.xlsx');
 					for k = 1:numel(fields)
 						sheetNm = ['E',lower(fields{k})];
