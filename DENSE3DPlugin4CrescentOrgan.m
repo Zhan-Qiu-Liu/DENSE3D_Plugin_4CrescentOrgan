@@ -56,6 +56,8 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Initialize DENSE3DPlugin4CrescentOrgan', 'Callback', @(s,e)self.initGUI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Delete the Pre-defined Slice of Interest', 'Callback', @(s,e)self.deleteSOI());
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Export GIF Movie', 'Callback', @(s,e)self.saveGIF());
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Analyze Single Subject', 'Callback', @result4SingleSubj);
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Compare among Subjects', 'Callback', @result4MultiSubj);
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
@@ -764,7 +766,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			if isempty(self.dataObj.EndocardialMesh); return; end
 						
 			self.hShowMesh.fig = figure(...
-			'Name', 'Refine 3D Mesh | created by Liu', ...
+			'Name', 'Refine 3D Mesh | created by Zhan-Qiu', ...
 			'NumberTitle',   'off', ...
 			'color', self.BackgroundColor, ...%'none'
 			'units', 'normalized',...
@@ -1603,11 +1605,11 @@ scatter3(points(:,1),points(:,2),points(:,3),5,'k','o');
 				'Callback', @(s,e)pickEndo());
 
 			% Strains([LVendo; RVendo] X [Septum=1, Freewall=2, Global=3])
-			cirLoc = 2;
+			cirLoc = 2; strCirLoc = {'Septum', 'Freewall', 'Global'};
 			self.hPickSlice.hListbox(3) = uicontrol(...
 				'parent', self.hShowMesh.fig,...
 				'Style', 'listbox',...
-				'String', {'Septum', 'Freewall', 'Global'},...
+				'String', strCirLoc,...
 				'Value', cirLoc,...
 				'units', 'Normalized',...
 				'Position', [0.82 0.1 0.15 0.07],...
@@ -1861,13 +1863,14 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				import plugins.dense3D_plugin.*
 				
 %%% regional heterogeneity of strain (circumferential (CURE), longitudinal (LURE), and radial (RURE) uniformity ratio estimates)
-% Bug: start from frame#0 or frame#1?
+% Bug? dense3D_plugin: start from frame#0 instead of frame#1!
 				% Use the mean LV contraction as a reference for DelayTimes
 				tmp = self.dataObj.Strains(1).p2;
 				reference = mean(tmp, 1);
 				RD = RegionalDyssynchrony(permute(Strains.p2, [1 3 2]));
 				delays = RD.computeRegionalDelays(reference);
 	
+				clear results output;
 				if idxEndo < 2
 					% Group Strains based upon their parameterization
 					% if cirLoc < 2
@@ -1901,19 +1904,33 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 						if isstruct(value); continue; end
 						output(1).(fields{k}) = NaN(nSegs(1),size(value,2));
 						func = @(x)mean(Strains.(fields{k})(x,:), 1);
-						results.(fields{k}) = cellfun(func, segments, 'UniformOutput', 0);
-						output(1).(fields{k})(ind,:) = cat(1, results.(fields{k}){:});
+						% results.(fields{k}) = cellfun(func, segments, 'UniformOutput', 0);
+						% output(1).(fields{k})(ind,:) = cat(1, results.(fields{k}){:});
+						%% compatitable for runDENSE3D.m:
+						tmp = cellfun(func, segments, 'UniformOutput', 0);
+						results.(fields{k}) = cat(1, tmp{:});
+						output(1).(fields{k})(ind,:) = results.(fields{k});
 						if nEndo > 1
 							output(2).(fields{k}) = NaN(nSegs(2),size(value,2));
 						end
 					end
+					
 					[output.CURE,output.RURE,output.LURE]=deal(NaN(3,nFrames));
-					output(1).CURE(2,:) = CURE(output(1).CC(ind,:).');
-					output(1).RURE(2,:) = CURE(output(1).RR(ind,:).');
-					output(1).LURE(2,:) = CURE(output(1).LL(ind,:).');
-					output(1).CLShearAngle = rad2deg(self.dataObj.torsion(output(1)));
+					results.CURE = reshape(CURE(output(1).CC(ind,:).'),1,[]);
+					output(1).CURE(2,:) = results.CURE;
+					results.RURE = reshape(CURE(output(1).RR(ind,:).'),1,[]);
+					output(1).RURE(2,:) = results.RURE;
+					results.LURE = reshape(CURE(output(1).LL(ind,:).'),1,[]);
+					output(1).LURE(2,:) = results.LURE;
+					
+					results.CLShearAngle = rad2deg(self.dataObj.torsion(results));
+					output(1).CLShearAngle = NaN(nSegs(1),size(Strains.RR,2));
+					% Compare: rad2deg(self.dataObj.torsion(output(1)));
+					output(1).CLShearAngle(ind,:) = results.CLShearAngle;
+					
+					results.DelayTimes = cellfun(@(x)mean(delays(x)), segments);
 					output(1).DelayTimes = NaN(nSegs(1),1);
-					output(1).DelayTimes(ind,:) = cellfun(@(x)mean(delays(x)), segments);
+					output(1).DelayTimes(ind,:) = results.DelayTimes;
 					if nEndo > 1
 						output(2).CLShearAngle = NaN(nSegs(2),nFrames);
 						output(2).DelayTimes = NaN(nSegs(2),1);
@@ -1934,10 +1951,15 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 						output(1).(fields{k}) = NaN(nSegs(1),size(value,2));
 						output(2).(fields{k}) = NaN(nSegs(2),size(value,2));
 						func = @(x)mean(Strains.(fields{k})(x,:), 1);
-						results.(fields{k}) = cellfun(func, segments, 'UniformOutput', 0);
-						output(1).(fields{k})([9,8],:) = cat(1, results.(fields{k}){[5,6]});
-						output(2).(fields{k})(5:8,:) = cat(1, results.(fields{k}){1:4});
+						% results.(fields{k}) = cellfun(func, segments, 'UniformOutput', 0);
+						% output(1).(fields{k})([9,8],:) = cat(1, results.(fields{k}){[5,6]});
+						% output(2).(fields{k})(5:8,:) = cat(1, results.(fields{k}){1:4});
+						tmp = cellfun(func, segments, 'UniformOutput', 0);
+						results.(fields{k}) = cat(1, tmp{:});
+						output(1).(fields{k})([9,8],:) = results.(fields{k})([5,6],:);
+						output(2).(fields{k})(5:8,:) = results.(fields{k})(1:4,:);
 					end
+					
 					[output.CURE,output.RURE,output.LURE]=deal(NaN(3,nFrames));
 					%% RV Freewall w.t. Septum:
 					%{ 
@@ -1947,15 +1969,27 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 					output(1).RURE(2,:) = CURE(output(1).RR([9,8],:).');
 					output(1).LURE(2,:) = CURE(output(1).LL([9,8],:).');
 					 %}
-					output(2).CURE(2,:) = CURE(output(2).CC(5:8,:).');
-					output(2).RURE(2,:) = CURE(output(2).RR(5:8,:).');
-					output(2).LURE(2,:) = CURE(output(2).LL(5:8,:).');
-					output(1).CLShearAngle = rad2deg(self.dataObj.torsion(output(1)));
-					output(2).CLShearAngle = rad2deg(self.dataObj.torsion(output(2)));
+					results.CURE = reshape(CURE(output(2).CC(5:8,:).'),1,[]);
+					output(2).CURE(2,:) = results.CURE;
+					results.RURE = reshape(CURE(output(2).RR(5:8,:).'),1,[]);
+					output(2).RURE(2,:) = results.RURE;
+					results.LURE = reshape(CURE(output(2).LL(5:8,:).'),1,[]);
+					output(2).LURE(2,:) = results.LURE;
+					
+					
+					results.CLShearAngle = rad2deg(self.dataObj.torsion(results));
+					output(1).CLShearAngle = NaN(nSegs(1),size(Strains.RR,2));
+					output(1).CLShearAngle([9,8],:) = results.CLShearAngle([5,6],:);
+					% output(1).CLShearAngle = rad2deg(self.dataObj.torsion(output(1)));
+					output(2).CLShearAngle = NaN(nSegs(2),size(Strains.RR,2));
+					output(2).CLShearAngle(5:8,:) = results.CLShearAngle(1:4,:);
+					% output(2).CLShearAngle = rad2deg(self.dataObj.torsion(output(2)));
+					
+					results.DelayTimes = cellfun(@(x)mean(delays(x)), segments);
 					output(1).DelayTimes = NaN(nSegs(1),1);
-					output(1).DelayTimes([9,8],:) = cellfun(@(x)mean(delays(x)), segments([5,6]));
+					output(1).DelayTimes([9,8],:) = results.DelayTimes([5,6]);
 					output(2).DelayTimes = NaN(nSegs(2),1);
-					output(2).DelayTimes(5:8,:) = cellfun(@(x)mean(delays(x)), segments(1:4));
+					output(2).DelayTimes(5:8,:) = results.DelayTimes(1:4);
 				end
 
 				% Create output struct to save everything in
@@ -1975,27 +2009,38 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				
 				button = questdlg('Do you wanna save the result?','Yes');
 				if strcmpi(button,'Yes')				
-					fields = {'RR','CC','LL','CL','RC','RL'};%,'CLShearAngle','CURE','RURE','LURE'
-					workbookNm =fullfile(parentDir,'RV_polar_strains_Baseline.xlsx');
+					str = {'LV', 'RV'};
+					fields = {'RR','CC','LL','CL','RC','RL','CLShearAngle','CURE','RURE','LURE'};
+					workbookNm = fullfile(parentDir,['Results_',str{idxEndo},'.xlsx']);
 					for k = 1:numel(fields)
 						sheetNm = ['E',lower(fields{k})];
-						tmp = cat(1, results.(fields{k}){:});
-						tmp = num2cell(tmp(:,self.hShowMesh.Frame));
+						nRows = size(results.(fields{k}),1);
+						tmp = num2cell(results.(fields{k})(:,self.hShowMesh.Frame));
 						try
 							[~,~, existingData] = xlsread(workbookNm,sheetNm);
 						catch
-							existingData = [{'Dataset';'self.hShowMesh.Frame No';'Slice'};num2cell([1:6]')];
+							existingData = [{'Dataset';'self.hShowMesh.Frame No';'Slice'};num2cell([1:nRows]')];
 						end
 						try
-							xlswrite(workbookNm,[existingData,[{fname};{self.hShowMesh.frame};sprintf('+%.3g',slice);tmp]],sheetNm);
+							xlswrite(workbookNm,[existingData,[{fname};{self.hShowMesh.frame};[str{idxEndo},sprintf('_%.3g',slice),paramName{idxParam},strCirLoc{cirLoc}];tmp]],sheetNm);
 						catch
 							keyboard;
 						end
 					end
+					
 					savePath = get(self.configObj, 'Location.LoadWorkspace', pwd);
-					save(fullfile(savePath,['RV_polar_strains_',sprintf('s%.3g',slice),'_f',num2str(self.hShowMesh.frame),'.mat']),'results');
-					hgexport(self.hShowMesh.fig,fullfile(savePath,['RV_polar_strains_',sprintf('s%.3g',slice),'_f',num2str(self.hShowMesh.frame),'.jpg']),hgexport('factorystyle'), 'Format', 'jpeg');
-					msg = {'Results saved in the file:',workbookNm};
+					save(fullfile(savePath,['SOI_',str{idxEndo},'_',paramName{idxParam},strCirLoc{cirLoc},'_',sprintf('s%.3g',slice),'_f',num2str(self.hShowMesh.frame),'.mat']),'results');
+					hgexport(self.hShowMesh.fig,fullfile(savePath,['SOI_',str{idxEndo},'_',paramName{idxParam},strCirLoc{cirLoc},'_',sprintf('s%.3g',slice),'_f',num2str(self.hShowMesh.frame),'.jpg']),hgexport('factorystyle'), 'Format', 'jpeg');
+					
+					%% output workspace for DENSE3D:
+					results.torsion = results.CLShearAngle;
+					fields = fieldnames(results);
+					for k = 1:numel(fields)
+						DENSE3Dobject.Mesh.regionalstrains.(fields{k}) = {results.(fields{k})};
+					end
+					save(fullfile(savePath,['DENSE3Dobject_',str{idxEndo},'_',paramName{idxParam},strCirLoc{cirLoc},'_',sprintf('s%.3g',slice),'_f',num2str(self.hShowMesh.frame),'.mat']),'DENSE3Dobject');
+					
+					msg = {'Results saved in the excel file:',workbookNm, 'and in the directory:',savePath};
 				else
 					msg = {};
 				end
