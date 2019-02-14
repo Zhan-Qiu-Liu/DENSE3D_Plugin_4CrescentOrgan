@@ -3,18 +3,17 @@ function result4MultiSubj(varargin)
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
 % set currunt Dir.
+import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 
 
 %% Define some Program Constants
-regions = {'Septal','Inferior','Lateral','Anterior'};
-transmural = {' Sub-endocardium',' Mid-wall',' Sub-epicardium',' Myocardium'};
 fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
 % fields = {'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ', 'RR', 'RC', 'RL', 'CR', 'CC', 'CL', 'LR', 'LC', 'LL', 'p1', 'p2', 'p3', 'torsion', 'J'};
 Marker = {'x','+','*','o','^','s','v','d','>','p','<','+','*','o','s','d','x'};
 Color = {'b','r','k','g','y','m','c','b','r','k','g','y','m','c'};
 % LineStyle = {'-',':','-.','--'};
-% commandwindow;
 
+% commandwindow;
 %%% Analysis Type:
 tmp = {'1.Average Strain Curves (all-in-one)','2.Strain curves plotted curve-wise','3.Global Strain curves plotted curve-wise Base, Mid-ventricular, Apex and the Whole LV','4.Global Torsion','5.Transmural trend','6.Figures in Thesis Format','7.Segmentational strain curves with errorbar(Matlab 2013b or below)','7.1.Regional strain curves with errorbar(Matlab 2013b or below)','7.2.Transmural strain curves with errorbar(Matlab 2013b or below)','7.3.Global strain curves at Base and Apex plotted with errorbar(Matlab 2013b or below)','7.4.Mid-ventricular Global strain curves with errorbar','8.Reproducibility assessment(Report the numbers of pairwise datasets)','8.1.Reproducibility assessment for global strains: Base VS Mid VS Apex','9.Two-Way ANOVA','10.Output raw data for statistical test + Std. Err. & Summary of Peak Strains','11.Global Peak strains of 3 SA slices: Base vs Mid vs Apex','','----------Control VS Isoproterenol----------','12.Control VS Isoproterenol: Strain curves plotted curve-wise','13.Control VS Isoproterenol: Average Strain Curves (all-in-one)','14. Table and Bar Graph of Global Peak strains of 3 SA slices: Base vs Mid vs Apex(Matlab 2013b or below)','15.Segmentational strain curves with errorbar(Matlab 2013b or below)','15.1.Regional strain curves with errorbar(Matlab 2013b or below)','15.2.Transmural strain curves with errorbar(Matlab 2013b or below)','15.3.Global strain curves with errorbar : Base vs Mid vs Apex (Matlab 2013b or below)','16.Two-sample t-test with unpooled variance & wilcoxon rank sum test','17.Output raw data for statistical test + Std. Err. & Summary of Peak Strains','Select the number of output option:'}; 
 option = input(strcat([sprintf('%s\n',tmp{:})]));
@@ -104,16 +103,21 @@ for ii = 1:nFiles
 		save(filename,'DENSE3Dobject');
 	end
 	tmp = load(files{ii}); %, 'DENSE3Dobject', '-mat');
-	nFrames(ii) = tmp.DENSE3Dobject.Data(1).SequenceInfo(1, 1).CardiacNumberOfImages;
+	try
+		nFrames(ii) = tmp.DENSE3Dobject.Data(1).SequenceInfo(1, 1).CardiacNumberOfImages;
+	catch
+		nFrames(ii) = size(tmp.DENSE3Dobject.Mesh.regionalstrains.CC{1},2);
+	end
 	data{ii} = tmp.DENSE3Dobject.Mesh.regionalstrains;
 	
 	% switch option
 		% case 4
-	torsion_global{ii} = mean(tmp.DENSE3Dobject.Mesh.strains.torsion,1);
+	torsion_global{ii} = mean(tmp.DENSE3Dobject.Mesh.regionalstrains.torsion{1},1);
+	
 		% case 11
-		
+	%{ 	
 	for jj = 1:numel(fields)
-		strain_SliceGlobal{ii}.(fields{jj}) = mean(data{ii}.(fields{jj}){1,4},1);
+		strain_SliceGlobal{ii}.(fields{jj}) = mean(cat(1,data{ii}.(fields{jj}){:}),1);
 		ind = (tmp.DENSE3Dobject.Mesh.absind == 1);
 		strain_BaseGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(ind,:),1);
 		temp = max(tmp.DENSE3Dobject.Mesh.absind);
@@ -121,22 +125,22 @@ for ii = 1:nFiles
 		strain_ApexGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(ind,:),1);
 		strain_Global{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj}),1);
 	end
-	
+	 %}
 end
 
 
 % Validate inputed datasets:
 [ind, ~] = size(data{1}.(fields{1}));
 [ind2, ~] = size(data{1}.(fields{1}){1,1});
-for ii = 2:nFiles
+for ii = 1:nFiles
 	[nSlices, nLayers] = size(data{ii}.(fields{1}));
 	if nSlices ~= ind
 		error(strcat('The number of Slices for each Inputed Datasets is different:',sprintf(' %d',nSlices),' NOT EQUAL TO',sprintf(' %d',ind)));
 		return	
 	end
 	[nRegions, ~] = size(data{ii}.(fields{1}){1,1});
-	if nRegions > 4 || nRegions ~= ind2
-		error(strcat('The number of regions for Input #',sprintf('%d',ii),' is invalid:',sprintf('%d',nRegions),'----Only support that myocardium is divided into 4 regions.'));
+	if nRegions > 6 || nRegions ~= ind2
+		error(strcat('The number of regions for Input #',sprintf('%d',ii),' is invalid:',sprintf('%d',nRegions),'----Only support that myocardium is divided into 4 or 6 regions.'));
 		return
 	end
 	if nLayers > 4
@@ -166,6 +170,24 @@ for ii = 2:nFiles
 	end
 end
 
+%% Define some Program Constants
+if nRegions == 4
+	regions = {'Septal','Inferior','Lateral','Anterior'};
+elseif nRegions == 6
+	regions = {'Anteroseptal','Inferoseptal','Inferior','Inferolateral','Anterolateral','Anterior'};
+else
+	error(strcat('The number of regions for Input #',sprintf('%d',ii),' is invalid:',sprintf('%d',nRegions),'----Only support that myocardium is divided into 4 or 6 regions.'));
+	return
+end
+if nLayers == 1
+	transmural = {' Myocardium'};
+elseif nLayers == 4
+	transmural = {' Sub-endocardium',' Mid-wall',' Sub-epicardium',' Myocardium'};	
+else
+	error(strcat('The number of layers for Input #',sprintf('%d',ii),' is invalid:',sprintf('%d',nRegions),'----Only support that myocardium is divided into 1 or 4 layers.'));
+	return
+end
+
 % Normalized:
 minFrame = min(nFrames);
 queryPoints = [1/minFrame:1/minFrame:1]*100;
@@ -176,6 +198,7 @@ for ii = 1:nFiles
 		% normalDataS{ii} = data{ii};
 		normalData{ii} = data{ii};
 		torsionH(ii,:) = torsion_global{ii};
+		%{ 
 		%% Time curves for basal & apical global strains:
 		for jj = 1:numel(fields)					
 			normalSliceGlobalData.(fields{jj})(ii,:) = strain_SliceGlobal{ii}.(fields{jj});
@@ -183,6 +206,7 @@ for ii = 1:nFiles
 			normalApexGlobalData.(fields{jj})(ii,:) = strain_ApexGlobal{ii}.(fields{jj});
 			normalGlobalData.(fields{jj})(ii,:) = strain_Global{ii}.(fields{jj});
 		end
+		 %}
 	else
 		samplePoints = [1/nFrames(ii):1/nFrames(ii):1]*100;
 		for jj = 1:numel(fields)					
@@ -221,11 +245,13 @@ hold on;
 plot([1/minFrame:1/minFrame:1],normalDataS{ii}.(fields{jj}){slice,layer}(region,:),'LineWidth',1,'color', 'r','Marker', '+', 'MarkerSize',5); 
 %% Interpolate points closely in a line connecting  nearby 2 points:
  %}
-figure
-plot([1/nFrames(ii):1/nFrames(ii):1],data{ii}.(fields{jj}){slice,layer}(region,:),'LineWidth',1,'color','b','Marker','x','MarkerSize',5); 
-hold on;
-plot([1/minFrame:1/minFrame:1],normalData{ii}.(fields{jj}){slice,layer}(region,:),'LineWidth',1,'color', 'r','Marker', '+', 'MarkerSize',5); 
-title('Validate Interpolation!');
+if nFrames(ii) ~= minFrame
+	figure
+	plot([1/nFrames(ii):1/nFrames(ii):1],data{ii}.(fields{jj}){slice,layer}(region,:),'LineWidth',1,'color','b','Marker','x','MarkerSize',5); 
+	hold on;
+	plot([1/minFrame:1/minFrame:1],normalData{ii}.(fields{jj}){slice,layer}(region,:),'LineWidth',1,'color', 'r','Marker', '+', 'MarkerSize',5); 
+	title('Validate Interpolation!');
+end
 
 % Leading name of figures:
 if numel(folders) < 4
@@ -728,11 +754,11 @@ for jj = 1:numel(fields)
 		hgsave(gcf,strcat('CoV_',fname,'_E',lower(fields{jj}),num2str(slice)));
 		close gcf;
 		close gcf;
-		table = [{'CoV','Endo','Mid','Epi','Myocardium'};[{'Septal','Inferior','Lateral','Anterior','Global'}',num2cell(CoV.(fields{jj}){slice})]];
+		table = [[{'CoV'},transmural];[[regions,{'Global'}]',num2cell(CoV.(fields{jj}){slice})]];
 		xlswrite(strcat('Summary_CoV_',fname),table, strcat('E_',lower(fields{jj})));
 	end
 end
-table = [{'Components','CoV','Septal','Inferior','Lateral','Anterior','Global'};[reshape([fields;repmat({''},1,numel(fields));repmat(repmat({''},1,numel(fields)),2,1)],[],1),repmat({'Endo','Mid','Epi','Myocardium'}',numel(fields),1),num2cell(tCoV)]];
+table = [[{'Components','CoV'},regions,{'Global'}];[reshape([fields;repmat({''},1,numel(fields));repmat(repmat({''},1,numel(fields)),2,1)],[],1),repmat(transmural',numel(fields),1),num2cell(tCoV)]];
 xlswrite(strcat('Summary_CoV_AllInOne',fname),table,'Langragian Strains');
 save(strcat('Var_CoV_',fname),'CoV','tCoV');
 
