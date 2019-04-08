@@ -1222,16 +1222,7 @@ end
 			%% Initialize a RV endo mesh:
 			points = cat(1, self.hShowMesh.rois{:,3});
 			mesh = Generate_Mesh(points, 0, center);% adjust = true;
-%% Depict initial RV endo mesh
-%{
-figure;
-hold on; axis equal; xlabel('x'); ylabel('y'); zlabel('z'); grid on;
-trisurf([mesh.tri_n1' mesh.tri_n2' mesh.tri_n3'], mesh.node_x, mesh.node_y, mesh.node_z);
-% patch('faces',[mesh.tri_n1' mesh.tri_n2' mesh.tri_n3'], 'vertices',[mesh.node_x, mesh.node_y, mesh.node_z], 'FaceColor', 'w', 'FaceAlpha', 0.5);
-for slice=1:size(self.hShowMesh.rois,1)
-	plot3(self.hShowMesh.rois{slice,3}(:,1),self.hShowMesh.rois{slice,3}(:,2),self.hShowMesh.rois{slice,3}(:,3),'LineWidth',1,'color', 'b');
-end
-%}
+
 			%%% Adjust Mesh controlled by the Fitting parameters:
 			% set the starting and ending parameter values that are lineraly varied (from the starting to the ending values) over the iterations. The parameters are "normal R", "tagent R", "smoothing weight", "points weight" and the number of interations.
 			initial_smoothness_weight = .9;
@@ -1270,7 +1261,7 @@ end
 					end		
 				end
 
-%% Export figures:
+				%% Export figures:
 % 1. set breakpoint @ "meshes.vertices = Adjust_Mesh_Mex ..."
 % 2. run codes "IOP = zeros(1,0); ... view(nor);"
 % 3. run codes below
@@ -1290,7 +1281,7 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 % setPositionConstraintFcn(h,fcn);
 % setColor(h,'r');
 % addNewPositionCallback(h,@(pos) proj(pos));
-%}
+ %}
 						figure;
 						hold on; axis equal; xlabel('x'); ylabel('y'); zlabel('z'); grid on;
 						title(['initial_nor_R=',num2str(initial_nor_R),';','final_nor_R=',num2str(final_nor_R),';','initial_tan_R=',num2str(initial_tan_R),';','final_tan_R=',num2str(final_tan_R)]);
@@ -1302,8 +1293,6 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 						end
 % hgexport(gcf,fullfile(tmp,[num2str(gcf),sprintf('_%.1g',[initial_nor_R,final_nor_R]),'.jpg']),hgexport('factorystyle'), 'Format', 'jpeg');%R2014b or above:get(gcf,'Number')
 % hgsave(gcf,fullfile(tmp,[num2str(gcf),sprintf('_%.1g',[initial_nor_R,final_nor_R]),'.fig']));
-% hgexport(,'.jpg',hgexport('factorystyle'), 'Format', 'jpeg');%R2014b or above:get(gcf,'Number')
-% hgsave(,'.fig');
 					end
 				end
 				
@@ -1319,7 +1308,7 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 					initial_nor_R = tmp
 					break
 				end		
-			end
+            end
 			while true
 				tmp = inputdlg('Choose the best UPPER LIMIT for the distance from the mesh in the NORMAL direction based on a series of fittings of generated RV endo meshes to the actual RV endo contours:','Final Normal R',1,{''},opts);
 				if isempty(tmp); continue; end;
@@ -1343,7 +1332,6 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 						title(['initial_nor_R=',num2str(initial_nor_R),';','final_nor_R=',num2str(final_nor_R),';','initial_tan_R=',num2str(initial_tan_R),';','final_tan_R=',num2str(final_tan_R)]);
 						 %}
 						patch(meshes, 'FaceColor', 'w', 'FaceAlpha', 0.5);
-% trisurf(meshes.faces, meshes.vertices(:,1)', meshes.vertices(:,2)', meshes.vertices(:,3)'); % color is proportional to surface height
 						% scatter3(points(:,1),points(:,2),points(:,3),3,'k','*');
 						for slice=1:size(self.hShowMesh.rois,1)
 							plot3(self.hShowMesh.rois{slice,3}(:,1),self.hShowMesh.rois{slice,3}(:,2),self.hShowMesh.rois{slice,3}(:,3),'LineWidth',1,'color', 'b');
@@ -1376,15 +1364,9 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 			end
 		end
 			
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
-%% Adjustment with GUI
-%{ 
-[tmp.PANEL_COLOR, tmp.FIGURE_BACKGROUND_COLOR, tmp.GUI_BACKGROUND_COLOR] = deal([ 231 234 241 ] / 255);
-tmp.TEXT_COLOR = [ 0 0 0 ] / 255;
-meshes.vertices = Adjust_Mesh(mesh, points, tmp, 'RVendo');
-%}
 			meshes.vertices = Adjust_Mesh_Mex(mesh, points, iterations, [initial_smoothness_weight, final_smoothness_weight], [initial_points_weight, final_points_weight], [initial_nor_R, final_nor_R],  [initial_tan_R, final_tan_R]);
 			
+			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 			self.dataObj.EndocardialMesh = struct('faces', [], 'vertices', []);
 			% try
 				self.dataObj.EndocardialMesh = wrapMesh(meshes);

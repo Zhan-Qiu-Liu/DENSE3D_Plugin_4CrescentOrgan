@@ -2,15 +2,27 @@ function result4SingleSubj(varargin)
 % Last Modified: 1:06 PM Thursday, October 15, 2015
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
-% clear;
-% clc;
+import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 
 %%%	Goto the directory in Matlab where Inputs are
 %set current Dir.
 files = DENSE2DobjectFileName()
-if isempty(files)
-	msgbox('Please place all .mat generated for each slice with DENSE2D in the current directory of Matlab','Error');
-	return
+button = questdlg('Do you happy with the auto-selected files in printout?','Warning','Yes');
+if isempty(files) || ~strcmpi(button,'Yes')
+	clear files folders;
+	ii = 0;
+	while true
+		[uifile, uipath, uipopup] = uigetfile({'*.mat', 'Select DENSE2D Outputs (*.mat)'},'Open',pwd);
+		if ~uipopup %isequal(uifile,0) || isequal(uipath,0)
+			break
+		else
+			ii = ii + 1;
+			files{ii} = fullfile(uipath,uifile);
+			% tmp = fileparts(uipath);
+			% [~,folders{ii}] = fileparts(tmp);
+		end
+	end
+	% msgbox('Please place all .mat generated for each slice with DENSE2D in the current directory of Matlab','Error'); return
 end
 
 %% Standardize the Data loaded from DENSE2Dobject:

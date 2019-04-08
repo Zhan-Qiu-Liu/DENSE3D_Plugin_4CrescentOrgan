@@ -7,8 +7,8 @@ import plugins.DENSE3D_Plugin_4CrescentOrgan.*
 
 
 %% Define some Program Constants
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ', 'RR', 'RC', 'RL', 'CR', 'CC', 'CL', 'LR', 'LC', 'LL', 'p1', 'p2', 'p3', 'torsion', 'J'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ', 'RR', 'RC', 'RL', 'CR', 'CC', 'CL', 'LR', 'LC', 'LL', 'p1', 'p2', 'p3', 'CLShearAngle', 'J'};
 Marker = {'x','+','*','o','^','s','v','d','>','p','<','+','*','o','s','d','x'};
 Color = {'b','r','k','g','y','m','c','b','r','k','g','y','m','c'};
 % LineStyle = {'-',':','-.','--'};
@@ -112,20 +112,23 @@ for ii = 1:nFiles
 	
 	% switch option
 		% case 4
-	torsion_global{ii} = mean(tmp.DENSE3Dobject.Mesh.regionalstrains.torsion{1},1);
+	% torsion_global{ii} = mean(tmp.DENSE3Dobject.Mesh.regionalstrains.CLShearAngle{1},1);
+	torsion_global{ii} = mean(tmp.DENSE3Dobject.Mesh.strains.CLShearAngle,1);
 	
 		% case 11
-	%{ 	
 	for jj = 1:numel(fields)
 		strain_SliceGlobal{ii}.(fields{jj}) = mean(cat(1,data{ii}.(fields{jj}){:}),1);
-		ind = (tmp.DENSE3Dobject.Mesh.absind == 1);
-		strain_BaseGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(ind,:),1);
+		strain_BaseGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(tmp.DENSE3Dobject.Mesh.longInd>2,:),1);
+		strain_ApexGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(tmp.DENSE3Dobject.Mesh.longInd<2,:),1);
+		strain_Global{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj}),1);		
+		%{ 
+		% 4th layer for global results:
+		strain_SliceGlobal{ii}.(fields{jj}) = mean(data{ii}.(fields{jj}){1,4},1);
+		strain_BaseGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(tmp.DENSE3Dobject.Mesh.absind==1,:),1);
 		temp = max(tmp.DENSE3Dobject.Mesh.absind);
-		ind = (tmp.DENSE3Dobject.Mesh.absind == temp);		
-		strain_ApexGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(ind,:),1);
-		strain_Global{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj}),1);
+		strain_ApexGlobal{ii}.(fields{jj}) = mean(tmp.DENSE3Dobject.Mesh.strains.(fields{jj})(tmp.DENSE3Dobject.Mesh.absind==temp,:),1);
+		 %}
 	end
-	 %}
 end
 
 
@@ -265,7 +268,7 @@ switch option
 % switch floor(option)
 case 1
 % Average Strain Curves (all-in-one):
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -316,7 +319,7 @@ save(strcat('Var_PeakStrain_',fname),'Epeak','stderr','CoV');
 		
 case 2
 % Strain curves plotted curve-wise:
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -352,7 +355,7 @@ end
 
 case 3
 % Global Strain curves plotted curve-wise at Base, Mid-ventricular, Apex and the Whole LV:
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -457,7 +460,7 @@ close gcf;
 
 case 5 
 % Transmural trend:
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 frame = 9;
 for jj = 1 : 3
 	for slice = 1:nSlices
@@ -488,7 +491,7 @@ end
 
 case 6
 % Figures in Thesis Format: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -521,7 +524,7 @@ end
 
 case 7
 % Segmentational strain curves with errorbar: 
-fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		for region = 1:nRegions	
@@ -557,7 +560,7 @@ save(strcat('Var_errorbar_',fname),'aveBase','errBase','aveIso','errIso');
 
 case 7.1
 % Regional strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 layer = nLayers;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -592,7 +595,7 @@ save(strcat('Var_errorbar_Regional_',fname),'ave','stderr');
 
 case 7.2
 % Transmural strain curves with errorbar: 
-fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -626,8 +629,8 @@ save(strcat('Var_errorbar_Transmural_',fname),'aveBase','errBase','aveIso','errI
 
 case 7.3
 % Global strain curves at Base and Apex in Paper Format: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	figure('units','normalized','outerposition',[0 0 1 1]);
 	tmp = [];
@@ -694,7 +697,7 @@ elseif option = 8.2
 strain_SliceGlobal = strain_ApexGlobal;
 end
  %}
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 % pick my own bin locations
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -758,13 +761,13 @@ for jj = 1:numel(fields)
 		xlswrite(strcat('Summary_CoV_',fname),table, strcat('E_',lower(fields{jj})));
 	end
 end
-table = [[{'Components','CoV'},regions,{'Global'}];[reshape([fields;repmat({''},1,numel(fields));repmat(repmat({''},1,numel(fields)),2,1)],[],1),repmat(transmural',numel(fields),1),num2cell(tCoV)]];
+table = [[{'Components','CoV'},regions,{'Global'}];[reshape([fields;repmat(repmat({''},1,numel(fields)),nLayers-1,1)],[],1),repmat(transmural',numel(fields),1),num2cell(tCoV)]];
 xlswrite(strcat('Summary_CoV_AllInOne',fname),table,'Langragian Strains');
 save(strcat('Var_CoV_',fname),'CoV','tCoV');
 
 case 8.1
 %% CoV for global strains: Base VS Mid VS Apex 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 clear hCoV;
 for jj = 1:numel(fields)			
 	hCoV.(fields{jj}){1,1} = 'Base';
@@ -801,8 +804,8 @@ end
 
 case 9
 %% Two-Way ANOVA: Columns-Transmural Layers; Rows-Circumferential Segments
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		ANOVAin = [];
@@ -823,8 +826,8 @@ end
 
 case 10
 % Output raw data to Excel for statistical test + Std. Dev. & Summary of Peak Strains:
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 clear Epeak;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -861,7 +864,7 @@ save(strcat('Var_PeakStrain_',fname),'Epeak','tEpeak');
 case 11
 % Global Peak strains of 3 SA slices: Base vs Mid vs Apex
 clear strain_GlobalPeak;
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)				
 	tmpBase = []; tmpMid = []; tmpApex = [];
 	for ii = 1:nFiles
@@ -896,7 +899,7 @@ end
 		
 case 12
 % Control VS Isoproterenol: Strain curves plotted curve-wise
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -937,7 +940,7 @@ end
 
 case 13
 % Control VS Isoproterenol: Average Strain Curves (all-in-one)
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -991,7 +994,7 @@ save(strcat('Var_CONTROLvsISO_',fname),'aveBase','errBase','aveIso','errIso');
 case 14
 % Control VS Isoproterenol: Table and Bar Graph of Global Peak strains of 3 SA slices (Base vs Mid vs Apex)
 clear strain_GlobalPeak_Base strain_GlobalPeak_Iso hStrain err;
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)				
 	tmpBase = []; tmpMid = []; tmpApex = [];
 	for ii = 1:nBaseline
@@ -1105,8 +1108,8 @@ end
 
 case 15
 % Control VS Isoproterenol: Segmentational strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -1150,7 +1153,7 @@ save(strcat('Var_CONTROLvsISO_errorbar_',fname),'aveBase','errBase','aveIso','er
 
 case 15.1
 % Control VS Isoproterenol: Regional strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 layer = nLayers;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -1196,8 +1199,8 @@ save(strcat('Var_CONTROLvsISO_errorbar_Regional_',fname),'aveBase','errBase','av
 
 case 15.2
 % Control VS Isoproterenol: Transmural strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 0.5]);
@@ -1243,8 +1246,8 @@ save(strcat('Var_CONTROLvsISO_errorbar_Transmural_',fname),'aveBase','errBase','
 case 15.3
 return
 % Control VS Isoproterenol: Global strain curves with errorbar : Base vs Mid vs Apex: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	figure('units','normalized','outerposition',[0 0 1 0.5]);
 
@@ -1314,8 +1317,8 @@ end
 case 15.4
 % ALL-IN-ONE!!!
 % Control VS Isoproterenol: Segmentational strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		for region = 1:nRegions	
@@ -1358,7 +1361,7 @@ save(strcat('Var_CONTROLvsISO_errorbar_',fname),'aveBase','errBase','aveIso','er
 case 15.5
 % ALL-IN-ONE!!!
 % Control VS Isoproterenol: Regional strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 layer = nLayers;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -1402,8 +1405,8 @@ save(strcat('Var_CONTROLvsISO_errorbar_Regional_',fname),'aveBase','errBase','av
 case 15.6
 % ALL-IN-ONE!!!
 % Control VS Isoproterenol: Transmural strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		figure('units','normalized','outerposition',[0 0 1 1]);
@@ -1446,7 +1449,7 @@ save(strcat('Var_CONTROLvsISO_errorbar_Transmural_',fname),'aveBase','errBase','
 case 15.7
 % Plotted Separately!!!
 % Control VS Isoproterenol: Regional strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 layer = nLayers;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
@@ -1491,8 +1494,8 @@ save(strcat('Var_CONTROLvsISO_errorbar_Regional_',fname),'aveBase','errBase','av
 case 15.8
 % Plotted Separately!!!
 % Control VS Isoproterenol: Transmural strain curves with errorbar: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		for layer = 1:nLayers-1
@@ -1536,8 +1539,8 @@ save(strcat('Var_CONTROLvsISO_errorbar_Transmural_',fname),'aveBase','errBase','
 case 15.9
 % Plotted Separately!!!
 % Control VS Isoproterenol: Global strain curves with errorbar : Base vs Mid vs Apex: 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	figure('units','normalized','outerposition',[0 0 1 1]);
 
@@ -1574,8 +1577,8 @@ end
 
 case 16
 %% Control VS Isoproterenol: two-sample t-test with unpooled variance & wilcoxon rank sum test
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices
 		% Control VS Isoproterenol: Two-Sample t-Test for Segmentational strains: 
@@ -1643,7 +1646,7 @@ save(strcat('Var_Pval_',fname),'Pval','tPval','PVAL','wPval');
 
 case 16.1
 %% CoV for global strains: Base VS Mid VS Apex 
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
 clear hCoV;
 for jj = 1:numel(fields)			
 	hCoV.(fields{jj}){1,1} = 'Base';
@@ -1680,8 +1683,8 @@ end
 
 case 17
 % Output raw data to Excel for statistical test + Std. Dev. & Summary of Peak Strains:
-fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'torsion'};
-% fields = {'CC', 'LL', 'CL', 'torsion'};
+fields = {'RR', 'CC', 'LL', 'RC', 'RL', 'CL', 'CLShearAngle'};
+% fields = {'CC', 'LL', 'CL', 'CLShearAngle'};
 clear Epeak;
 for jj = 1:numel(fields)					
 	for slice = 1:nSlices

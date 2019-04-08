@@ -24,11 +24,10 @@
 function files = DENSE2DobjectFileName(directory,type)
 	%set current Dir.
 	if exist('directory', 'var')
-		tmp = dir(directory);
-		path = directory;
+		tmp = dir(directory); path = directory;
 	else
-		tmp = dir(pwd);
-		path = pwd;
+		path = uigetdir(pwd, 'Select the directory storing DENSE2D Outputs(*.mat)');
+		tmp = dir(path);
 	end
 	
 	tmp = {tmp.name};
@@ -43,8 +42,6 @@ function files = DENSE2DobjectFileName(directory,type)
 		end
 	end
 
-	
-	
 	if exist('type', 'var')
 		temp2 = strncmpi({'SA','LA'}, type, 5);
 		if sum(temp2) == 0
