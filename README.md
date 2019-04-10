@@ -1,7 +1,6 @@
 ## 3D DENSE Plugin for Crescent Organ
 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) affiliate plugin for analyzing 3D Cine **d**isplacement **en**coding with **s**timulated **e**choes (DENSE) MRI data of a crescent-shaped organ
-
-![Screenshot](screenshot.png)
+![Screenshot](screenshot.jpg)
 ![Animation](animation.gif)
 
 ### Applications
