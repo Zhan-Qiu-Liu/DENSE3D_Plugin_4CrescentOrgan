@@ -1,12 +1,14 @@
 ## 3D DENSE Plugin for Crescent Organ
 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) affiliate plugin for analyzing 3D Cine **d**isplacement **en**coding with **s**timulated **e**choes (DENSE) MRI data of a crescent-shaped organ
+![Screenshot](screenshot.png)
+![Animation](animation.gif)
 
 ### Applications
 - Right ventricle of small animals like rodent, which have a much more crescent-shaped cavity
 - The heart in which the biventricular shape is sharper at the right ventricle insertion points
 
 ### Features
-* Iteration Method for Adjusting the Finite Element Mesh into its Actual Crescent Shape
+* Iteration Algorithm for Finite Element Mesh Growing towards its Actual Crescent Shape
 * Precise Segmentation of Right Ventricular Free Wall from Left Ventricular Free Wall (by taking the fact into account that the anterior and inferior insertions of the RV to the LV shift circumferentially along the ventricular long axis)
 * A Graphical User Interface for User-defined Noise Suppression
 * A Graphical User Interface for Selecting the Finite Elements of Interest and Visualizing their Deforamtion 
@@ -42,7 +44,7 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 You are welcome to use the *DENSE3D_Plugin_4CrescentOrgan* in your research provided that you include the following citation in your work:
 
 >Zhan-Qiu Liu(2018). 3D DENSE Plugin for Crescent Organ. Retrieved
->from https://github.com/MMoTH/DENSE3D_Plugin_4CrescentOrgan
+>from https://github.com/Zhan-Qiu-Liu/DENSE3D_Plugin_4CrescentOrgan
 
 
 ### Known Bugs
