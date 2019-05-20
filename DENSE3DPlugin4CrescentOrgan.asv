@@ -2040,9 +2040,9 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 				for k = 1:numel(fields)
 					tmp = output.(fields{k});
                     if abs(size(tmp,2)-nFrames) < 1
-%self.viewerObj.cache.regionalStrain.(fields{k})(:,1) = [];
-                        self.viewerObj.cache.regionalStrain(1).(fields{k})(:,1) = [];
-						if numel(output)>1; self.viewerObj.cache.regionalStrain(2).(fields{k})(:,1) = []; end
+						tmp(:,1) = [];
+                        rmfield(self.viewerObj.cache.regionalStrain,fields{k});
+                        self.viewerObj.cache.regionalStrain.(fields{k})(:,1) = tmp;
 					end
 				end
 % In class 'plugins.dense3D_plugin.DENSE3Dviewer', no set method is defined for Dependent property 'Frames'.  A Dependent property needs a set method to assign its value:
