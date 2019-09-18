@@ -1,3 +1,53 @@
+%% Displacement Vectors:
+Nodes = [DisplacementInfo.X DisplacementInfo.Y];
+Nodes(:,3) = deal(0);
+disps = sqrt(DisplacementInfo.dX.^2 + DisplacementInfo.dY.^2 + DisplacementInfo.dZ.^2);
+for t = 37:69
+	VectorsToVTK(Nodes, disps(:,t), 'Displacements', [DisplacementInfo.dX(:,t),DisplacementInfo.dY(:,t),DisplacementInfo.dZ(:,t)], 'DisplacementVectors', ['DENSEdisp',num2str(t)])
+end
+
+col = SequenceInfo(1, 1).Columns; row = SequenceInfo(1, 1).Rows;
+% col = size(ImageInfo.Mag(:,:,1),1); row = size(ImageInfo.Mag(:,:,1),2);
+locs = [];
+for ii = 1:row
+	% locs = [locs; [repmat(ii,col,1), (1:col)']];
+	tmp = (1:col)'; tmp(:,2) = deal(ii);
+	locs = [locs; tmp];
+	% arrayfun(@(ii)[repmat(ii,col,1), (1:col)'], 1:row, 'UniformOutput', false)
+end
+locs(:,3) = deal(0);
+for t = 37:69
+	mag = ImageInfo.Mag(:,:,t);
+	VectorsToVTK(locs, mag(:), 'DENSEmag', [], '', ['DENSEmag',num2str(t)])
+end
+
+ImageInfo
+
+%% Nodes Path:
+Nodes = [DisplacementInfo.X DisplacementInfo.Y];
+Nodes(:,3) = deal(0);
+VectorsToVTK(Nodes, [], '', [], '', 'DENSEnodes36')
+for t = 37:69
+	VectorsToVTK(Nodes + [DisplacementInfo.dX(:,t) DisplacementInfo.dY(:,t) DisplacementInfo.dZ(:,t)], [], '', [], '', ['DENSEnodes',num2str(t)])
+end
+
+VectorsToVTK(Nodes, [], '', [], '', 'DENSEnodes0)
+for t = 1:33
+	VectorsToVTK(Nodes + [DisplacementInfo.dX(:,t+36) DisplacementInfo.dY(:,t+36) DisplacementInfo.dZ(:,t+36)], [], '', [], '', ['DENSEnodes',num2str(t)])
+end
+
+for t = 0:32
+	VectorsToVTK(Nodes, [], '', [], '', ['DENSEnodes',num2str(t)])
+	Nodes = Nodes + [DisplacementInfo.dX(:,t+37) DisplacementInfo.dY(:,t+37) DisplacementInfo.dZ(:,t+37)];
+end
+
+for t = 37:69
+	VectorsToVTK(Nodes, [], '', [], '', ['DENSEnodes',num2str(t-1)])
+	Nodes = Nodes + [DisplacementInfo.dX(:,t) DisplacementInfo.dY(:,t) DisplacementInfo.dZ(:,t)];
+end
+
+scatter3(Nodes(:,1),Nodes(:,2),Nodes(:,3),10,'r','x');
+
 
 			addpath('C:\Program Files\MATLAB\R2013b\toolbox\shared\rptgen\@rptgen_ud\@appdata_ud')
 getSubclasses('sde','C:\Program Files\MATLAB\R2013b\toolbox\finance\finsupport')

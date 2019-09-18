@@ -23,6 +23,8 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
         status = struct('SOI',[],'nSA',[],'nLA',[]);
         % SPLINE information
         spl = repmat(struct,[0 1]);
+        uniform = struct('seq',[],'CN',[]);
+        roi = {}; % repmat(struct,[0 1]);
 		straindata = [];
 
 		%% 3D DENSE:
@@ -59,6 +61,9 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Analyze Single Subject', 'Callback', @result4SingleSubj);
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Compare among Subjects', 'Callback', @result4MultiSubj);
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Create Displacement Map', 'Callback', @(s,e)self.dispMap());
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Compare among Subjects', 'Callback', @mat2ParaView);
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI', 'Callback', @(s,e)imageryROI(self,false));
+			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI-Data', 'Callback', @(s,e)imageryROI(self,true));
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
@@ -2299,7 +2304,7 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 				
 				%% Copyright (c) of the following section of the codes: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 				% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
-				% Last Modified: 19:32 June 27, 2018				
+				% Last Modified: 19:32 June 27, 2018
 				tmp = {'INFERIOR', 'ANTERIOR'};
 				if  prod(side) > 0
 					errordlg({['Two insertion points are at the same ',tmp{side(1)<0+1},' side for the contour line with the longitudinal parameter: ',num2str(longParam)],'Try to use alternative method in the codes above!'},'Debug Mode','modal');
@@ -2449,6 +2454,13 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 
 		end
 		
+		function imageryROI(self,flag)
+		% Last Modified: 19:39 September 13, 2019
+		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
+		import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+		handles = guidata(self.hfig(1));
+		imageryROIfcn(self, handles, flag);
+		end
     end
 	
     methods (Access = 'protected')

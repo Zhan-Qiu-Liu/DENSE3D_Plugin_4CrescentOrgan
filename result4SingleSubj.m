@@ -123,7 +123,7 @@ if strcmpi(flag_vol,'Yes')
 		end
 	else	
 		%% Load LA contours from .dns & auto-assign Frames of Interest:	
-		tmp = fullfile(char(java.lang.System.getProperty('user.home')),'Dropbox','Analysis');%Directory where DNS stored by default
+		tmp = fullfile(char(java.lang.System.getProperty('user.home')),'Dropbox','Analysis_Human');%Directory where DNS stored by default
 		[uifile,uipath] = uigetfile(...
 			{'*.dns','Open a DENSE2D workspace(*.dns)'},...
 			'Select DNS file',tmp);

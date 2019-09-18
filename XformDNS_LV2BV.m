@@ -10,7 +10,7 @@ function XformDNS_LV2BV(button,config,self)
 %
 %
 % See also:
-%   
+%
 %
 % Last Modified: 17:38 June 14, 2017
 % Copyright (c) Zhan-Qiu Liu (lafeir.lew@gmail.com)
@@ -19,8 +19,8 @@ function XformDNS_LV2BV(button,config,self)
 	
 	%% DIRECTORY LOAD: default inputs
 	homepath = char(java.lang.System.getProperty('user.home'));
-	pathDNS = fullfile(homepath,'Dropbox\Analysis')%Directory where DNS stored by default
-	pathMAT = fullfile(homepath,'Dropbox\MAT')%Directory where DENSE2D outputs(post-analyzed .MAT) stored by default
+	pathDNS = fullfile(homepath,'Dropbox','Analysis_Human')%Directory where DNS stored by default
+	pathMAT = fullfile(homepath,'Dropbox','MAT_Human')%Directory where DENSE2D outputs(post-analyzed .MAT) stored by default
 
 	if ~exist('button','var')
 		button = input('Press any key for using a User Interface to select Datasets of interest.\nOtherwise leave it blank!\n','s');

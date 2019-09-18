@@ -39,7 +39,7 @@ function analysisFcnREPL(self,obj,didx,ridx,seedframe,varargin)
 	if isfield(self.dns(didx),'seed') && seedframe<=size(self.dns(didx).seed,2) && ~isempty(self.dns(didx).seed{1,seedframe})
 		for ti = 1:numel(tagsB)
 			options.(tagsB{ti}) = self.dns(didx).seed{ti,seedframe};
-		end	
+		end
 	end
 	
 	if ~isempty(self.spl)
