@@ -38,11 +38,14 @@ plugins.PluginManager.import('https://github.com/MMoTH/DENSE3D_Plugin_4CrescentO
 	- [`wrapMesh.m`](wrapMesh.m), [`circumferentialParameterize.m`](circumferentialParameterize.m),  [`computeStrains.m`](computeStrains.m), [`analysisFcnREPL.m`](analysisFcnREPL.m), [`spl2strainFcnREPL.m`](spl2strainFcnREPL.m), [`exportMatREPL.m`](exportMatREPL.m), [`MeshControl.m`](MeshControl.m), and [`linearInterp.m`](linearInterp.m)
 - Copyright (c) of the following orignial Matlab scripts soley belongs to [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Contributors:
 	- [`contourDataREPL.m`](contourDataREPL.m), [`computeTransmuralDataREPL.m`](computeTransmuralDataREPL.m), [`resetFcnREPL.m`](resetFcnREPL.m), [`switchstateREPL.m`](switchstateREPL.m), and [`animatedgif.m`](animatedgif.m)
+- Copyright (c) of the following orignial Matlab scripts soley belongs to [*CardiacKinematicsPhantom*](https://github.com/luigiemp/CardiacKinematicsPhantom) Contributors:
+	- [`VectorsToVTK.m`](VectorsToVTK.m)
 
 ### Attribution
 
 You are welcome to use the *DENSE3D_Plugin_4CrescentOrgan* in your research provided that you include the following citation in your work:
-
+>Zhan-Qiu Liu, Xiaoyan Zhang, and Jonathan F. Wenk, 2019, "Quantification of Regional Right Ventricular Strain in Healthy Rats using 3D Spiral Cine DENSE MRI", Journal of Biomechanics, 94, pp.219-223.
+>
 >Zhan-Qiu Liu(2018). 3D DENSE Plugin for Crescent Organ. Retrieved
 >from https://github.com/Zhan-Qiu-Liu/DENSE3D_Plugin_4CrescentOrgan
 
