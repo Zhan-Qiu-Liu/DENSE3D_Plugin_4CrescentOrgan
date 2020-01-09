@@ -39,7 +39,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 
         function self = DENSE3DPlugin4CrescentOrgan(varargin)
 
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 			% load plugin config: plugin.json file
             self@plugins.DENSEanalysisPlugin(varargin{:});
 						
@@ -174,7 +174,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			if isempty(self.straindata)
 				self.menu_runanalysis_REPL;
 			else
-				import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+				import plugins.dense3D_plugin_4crescentorgan.*
 				opts = MeshControl(self.straindata);
 				drawnow
 				if isempty(opts); return; end
@@ -432,7 +432,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		% Copyright (c) 2016 DENSEanalysis Contributors
 		% Last Modified: 13:12 July 28, 2017
 		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 			
             handles = guidata(self.hfig(1));
 			% Get directory path by default:
@@ -537,7 +537,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		end
 
 		function reloadFcn(self)
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 			
             handles = guidata(self.hfig(1));
 			if isempty(handles.hdata)
@@ -612,7 +612,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 		end
 
 		function menu_runanalysis_REPL(self)
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 
             handles = guidata(self.hfig(1));
 			didx = handles.hdense.DENSEIndex;
@@ -1114,7 +1114,7 @@ end
 		% Last Modified: 1:06 PM Thursday, October 15, 2015
 		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 			
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 			% Use the up-to-dated Configuration file:
 			% settingfile = Configuration(fullfile(fileparts(which(class(self.dataObj))), 'settings.json'));
 			% Use the pre-loaded Configuration file:
@@ -1381,7 +1381,7 @@ scatter3(center(:,1)-4,center(:,2),center(:,3),400,'k','x','LineWidth',4,'Marker
 			end
 		end
 			
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 %% Adjustment with GUI
 %{ 
 [tmp.PANEL_COLOR, tmp.FIGURE_BACKGROUND_COLOR, tmp.GUI_BACKGROUND_COLOR] = deal([ 231 234 241 ] / 255);
@@ -1409,7 +1409,7 @@ meshes.vertices = Adjust_Mesh(mesh, points, tmp, 'RVendo');
 				self.showMesh();
 			end
 			
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 			% try deleteHandles(self.hPickSlice); end; try delete(self.hPickSlice.hPts); end
 
 			if ~isempty(self.hPickSlice)
@@ -2101,7 +2101,7 @@ scatter3(self.hShowMesh.ax,points(:,1),points(:,2),points(:,3),10,'g','x');
 		end
 
         function parameterize(self)
-            import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+            import plugins.dense3D_plugin_4crescentorgan.*
 			
 			rois = [self.dataObj.Data.ROIInfo];
 			SAslices = strwcmpi({rois.ROIType}, '*sa*');
@@ -2166,7 +2166,7 @@ anInfo = [anInfo.AnalysisInfo];
         
 		
 		function longitudinalParameterize(self, index, apicalSlice)
-            import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+            import plugins.dense3D_plugin_4crescentorgan.*
 			verts = self.dataObj.EndocardialMesh(index).vertices;
 			faces = self.dataObj.EndocardialMesh(index).faces;
             apex = self.dataObj.Apex(index,:);
@@ -2224,7 +2224,7 @@ set(hmeshes(2), 'FaceColor', 'flat', 'FaceVertexCData', ind, 'CDataMapping', 'sc
 		
         function insertion = anteriorInsertion(self, location, longParam)% index, 
 			if self.hShowMesh.isBiv
-				import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+				import plugins.dense3D_plugin_4crescentorgan.*
 				epiOutline = intersectVerts(self.dataObj.EpicardialMesh.vertices, self.dataObj.EpicardialMesh.faces, location, self.hPickSlice.normal, true);
 				nEndo = numel(self.dataObj.EndocardialMesh);
 				
@@ -2396,7 +2396,7 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 			
 			if isempty(self.hShowMesh); return; end
 			
-			import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+			import plugins.dense3D_plugin_4crescentorgan.*
 
 			hwait = waitbartimer();
 			cleanupObj = onCleanup(@(x)delete(hwait(isvalid(hwait))));
@@ -2457,7 +2457,7 @@ scatter3(epiOutline(:,1),epiOutline(:,2),epiOutline(:,3),10,'r','x');
 		function imageryROI(self,flag)
 		% Last Modified: 19:39 September 13, 2019
 		% Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
-		import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+		import plugins.dense3D_plugin_4crescentorgan.*
 		handles = guidata(self.hfig(1));
 		imageryROIfcn(self, handles, flag);
 		end

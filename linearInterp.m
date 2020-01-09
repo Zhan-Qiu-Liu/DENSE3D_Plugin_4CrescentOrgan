@@ -5,7 +5,7 @@ function linearInterp(dataObj,roiObj)
 % Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 % Last Modified: 22:06 October 28, 2018
 
-	% import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+	% import plugins.dense3D_plugin_4crescentorgan.*
 	% handles = guidata(self.hfig(1));
 	% dataObj = handles.hdata;
 	% roiObj = handles.hdense.hroi;

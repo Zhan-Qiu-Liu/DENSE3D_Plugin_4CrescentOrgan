@@ -2,7 +2,7 @@ function result4SingleSubj(varargin)
 % Last Modified: 1:06 PM Thursday, October 15, 2015
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
-import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+import plugins.dense3D_plugin_4crescentorgan.*
 
 %%%	Goto the directory in Matlab where Inputs are
 %set current Dir.

@@ -154,7 +154,7 @@ v(v<1e-7) = eps;
 
 				idxEndo = 1;
 				zeros(0,2)
-				import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+				import plugins.dense3D_plugin_4crescentorgan.*
 				cdata = RVlongitudinalParameterization(self.dataObj.EndocardialMesh(idxEndo).vertices, self.dataObj.EndocardialMesh(idxEndo).faces, self.dataObj.Apex(idxEndo,:));
 				ans(end+1,1)=numel(find(abs(cdata-.99) < .01));
 				ans(end+1,2)=numel(find(abs(cdata-.01) < .01));

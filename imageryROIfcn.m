@@ -4,7 +4,7 @@ function imageryROIfcn(self,handles,flag)
 % Last Modified: 11:10 September 13, 2019
 % Modified By: Zhan-Qiu Liu (lafeir.lew@gmail.com)
 
-	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+	import plugins.dense3D_plugin_4crescentorgan.*
 	obj = handles.hdata;
 	if flag; keyboard; end
 	

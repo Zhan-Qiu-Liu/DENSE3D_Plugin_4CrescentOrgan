@@ -14,7 +14,7 @@ function mat2ParaView
 %
 % Last Modified: 12:04 June 4, 2019
 % Copyright (c) Zhan-Qiu Liu (lafeir.lew@gmail.com)
-	import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+	import plugins.dense3D_plugin_4crescentorgan.*
 	
 	homepath = chars(java.lang.System.getProperty('user.home'));
 	pathDNS = fullfile(homepath,'Dropbox','Analysis_Human')%Directory where DNS stored by default

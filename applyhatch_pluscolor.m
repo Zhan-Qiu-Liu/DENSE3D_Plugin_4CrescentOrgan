@@ -90,7 +90,7 @@ function [newfig,im_hatch,colorlist] = applyhatch_pluscolor(h,patterns,CvBW,Hinv
 %  By Ben Hinkle, bhinkle@mathworks.com
 %  This code is in the public domain. 
 
-import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+import plugins.dense3D_plugin_4crescentorgan.*
 
 if ~exist('CvBW','var'); CvBW = 0      ; end  % defaults to black and white
 if isempty(CvBW); CvBW = 0     ; end  % defaults to black and white

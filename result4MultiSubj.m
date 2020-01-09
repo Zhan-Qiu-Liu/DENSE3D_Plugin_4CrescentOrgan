@@ -3,7 +3,7 @@ function result4MultiSubj(varargin)
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
 % set currunt Dir.
-import plugins.DENSE3D_Plugin_4CrescentOrgan.*
+import plugins.dense3D_plugin_4crescentorgan.*
 
 
 %% Define some Program Constants
