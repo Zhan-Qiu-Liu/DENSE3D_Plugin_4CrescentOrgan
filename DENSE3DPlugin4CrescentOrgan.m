@@ -64,6 +64,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Compare among Subjects', 'Callback', @mat2ParaView);
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI', 'Callback', @(s,e)imageryROI(self,false));
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI-Data', 'Callback', @(s,e)imageryROI(self,true));
+			uimenu('Parent', self.handles.menu_append, 'Label', 'merge DNS files', 'Callback', @mergeDNS);
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
