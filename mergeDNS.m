@@ -14,7 +14,7 @@
 % Last Modified: 11:39 PM Monday, November 2, 2015
 % Modified By: Zhanqiu Liu (lafeir.lew@gmail.com)
 
-function mergeDNS()
+function mergeDNS(varargin)
 
 	%% DIRECTORY LOAD
 	% default inputs
@@ -98,7 +98,7 @@ function mergeDNS()
 	%% Append the correct file extension if needed
 	% Method #1: Can replace an existing one
 	filename = fullfile(uipath,uifile);
-	Method #2: Never replace an existing one
+	% Method #2: Never replace an existing one
 	[~,~,ext] = fileparts(filename);
 	if ~strcmpi(ext, '.dns')
 		filename = strcat(filename, '.dns');
@@ -108,10 +108,3 @@ function mergeDNS()
 	% save(filename,'tmp1.seq','tmp1.img','tmp1.dns','tmp1.roi');
 
 end
-
-
-
-
-
-
-

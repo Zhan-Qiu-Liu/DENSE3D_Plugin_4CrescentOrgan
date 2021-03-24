@@ -138,7 +138,7 @@ function options = MeshControl(varargin)
 		error(errid,'Invalid Nmodel.');
 	end
 	if isempty(api.Nseg)
-		api.Nseg = api.Nmodel*10;
+		api.Nseg = 6;%api.Nmodel*10;
 	elseif ~checkseg(api.Nseg)
 		error(errid,'Invalid Nseg.');
 	end

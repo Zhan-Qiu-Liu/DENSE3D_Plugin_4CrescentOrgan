@@ -38,7 +38,7 @@ function analysisFcnREPL(self,obj,didx,ridx,seedframe,varargin)
 	tagsB = {'Xseed','Yseed','Zseed'};
 	if isfield(self.dns(didx),'seed') && seedframe<=size(self.dns(didx).seed,2) && ~isempty(self.dns(didx).seed{1,seedframe})
 		for ti = 1:numel(tagsB)
-			options.(tagsB{ti}) = self.dns(didx).seed{ti,seedframe};
+			try; options.(tagsB{ti}) = self.dns(didx).seed{ti,seedframe}; end
 		end
 	end
 	
@@ -103,9 +103,10 @@ function analysisFcnREPL(self,obj,didx,ridx,seedframe,varargin)
 		if ~isempty(self.spl.Xseed)
 			self.dns(didx).seed{1,self.spl.Xseed(end)} = self.spl.Xseed;
 			self.dns(didx).seed{2,self.spl.Yseed(end)} = self.spl.Yseed;
+		end
+		if ~isempty(self.spl.Zseed)
 			self.dns(didx).seed{3,self.spl.Zseed(end)} = self.spl.Zseed;
 		end
 		
-		% notify(obj,'NewState',DENSEEventData('new','spl'));
 	end
 end

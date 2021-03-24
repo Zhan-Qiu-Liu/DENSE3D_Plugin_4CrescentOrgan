@@ -1,0 +1,144 @@
+                            DENSEanalysisUID: '1.3.6.1.4.1.9590.100.1.2.147170131010958643702697568192639192307'
+                               TranslationRC: [0 0]
+                                    Filename: {45x1 cell}
+                                 FileModDate: {45x1 cell}
+                                    FileSize: 133120
+                                      Format: 'DICOM'
+                               FormatVersion: 3
+                                       Width: 90
+                                      Height: 90
+                                    BitDepth: 12
+                                   ColorType: 'grayscale'
+              FileMetaInformationGroupLength: {45x1 cell}
+                  FileMetaInformationVersion: [2x1 uint8]
+                     MediaStorageSOPClassUID: '1.2.840.10008.5.1.4.1.1.4'
+                  MediaStorageSOPInstanceUID: {45x1 cell}
+                           TransferSyntaxUID: '1.2.840.10008.1.2.1'
+                      ImplementationClassUID: '1.3.12.2.1107.5.2'
+                   ImplementationVersionName: 'MR_VE11C'
+                        SpecificCharacterSet: 'ISO_IR 100'
+                                   ImageType: 'ORIGINAL\PRIMARY'
+                        InstanceCreationDate: '20190430'
+                        InstanceCreationTime: {45x1 cell}
+                                 SOPClassUID: '1.2.840.10008.5.1.4.1.1.4'
+                              SOPInstanceUID: {45x1 cell}
+                                   StudyDate: '20190430'
+                                  SeriesDate: '20190430'
+                             AcquisitionDate: []
+                                 ContentDate: '20190430'
+                                   StudyTime: '162001.752000'
+                                  SeriesTime: '180814.754000'
+                             AcquisitionTime: '000000.000001'
+                                 ContentTime: {45x1 cell}
+                             AccessionNumber: ''
+                                    Modality: 'MR'
+                                Manufacturer: 'SIEMENS'
+                             InstitutionName: 'Palo Alto VAMC'
+                          InstitutionAddress: 'Miranda Ave 3801,Palo Alto,Western,US,94304'
+                      ReferringPhysicianName: [1x1 struct]
+                                 StationName: 'AWP145319'
+                            StudyDescription: 'Volunteer_TC'
+                           SeriesDescription: 'DENSE_OVS_4chamber_AveMag'
+                 InstitutionalDepartmentName: 'Department'
+                     PerformingPhysicianName: [1x1 struct]
+                       ManufacturerModelName: 'Skyra'
+                     ReferencedImageSequence: [1x1 struct]
+                                 PatientName: [1x1 struct]
+                                   PatientID: 'RMR_MWL_20190430'
+                            PatientBirthDate: '19940430'
+                                  PatientSex: 'M'
+                                  PatientAge: '025Y'
+                                 PatientSize: 1.7780
+                               PatientWeight: 77.1107
+                            BodyPartExamined: 'HEAD'
+                            ScanningSequence: 'RM'
+                             SequenceVariant: 'SP\OSP'
+                                 ScanOptions: 'FS\CT'
+                           MRAcquisitionType: '2D'
+                                SequenceName: '3Ddense2d1'
+                                   AngioFlag: 'N'
+                              SliceThickness: 8
+                              RepetitionTime: 15
+                                    EchoTime: 1.0800
+                            NumberOfAverages: []
+                            ImagingFrequency: 123.2512
+                               ImagedNucleus: '1H'
+                                  EchoNumber: 0
+                       MagneticFieldStrength: 3
+                  NumberOfPhaseEncodingSteps: []
+                             EchoTrainLength: 0
+                             PercentSampling: []
+                     PercentPhaseFieldOfView: []
+                              PixelBandwidth: 2.1475e+09
+                          DeviceSerialNumber: '145319'
+                             SoftwareVersion: 'syngo MR E11'
+                                ProtocolName: 'DENSE_OVS_4chamber'
+                                 TriggerTime: 0.5000
+                             NominalInterval: 0
+                       CardiacNumberOfImages: 23
+                            TransmitCoilName: 'Body'
+                           AcquisitionMatrix: [4x1 uint16]
+               InPlanePhaseEncodingDirection: 'COL'
+                                   FlipAngle: 15
+                       VariableFlipAngleFlag: 'N'
+                                         SAR: 0.0488
+                                        dBdt: 0
+                             PatientPosition: 'HFS'
+                            StudyInstanceUID: '1.3.12.2.1107.5.2.19.145319.30000019043023200176500000001'
+                           SeriesInstanceUID: '1.3.12.2.1107.5.2.19.145319.2019043018081038005765153.0.0.0'
+                                     StudyID: '1'
+                                SeriesNumber: 85
+                           AcquisitionNumber: 1
+                              InstanceNumber: {45x1 cell}
+                        ImagePositionPatient: [3x1 double]
+                     ImageOrientationPatient: [6x1 double]
+                         FrameOfReferenceUID: '1.3.12.2.1107.5.2.19.145319.1.20190430175023003.0.0.5303'
+                  PositionReferenceIndicator: ''
+                               SliceLocation: 277.1502
+                               ImageComments: {45x1 cell}
+                             SamplesPerPixel: 1
+                   PhotometricInterpretation: 'MONOCHROME2'
+                                        Rows: 90
+                                     Columns: 90
+                                PixelSpacing: [2x1 double]
+                               BitsAllocated: 16
+                                  BitsStored: 12
+                                     HighBit: 11
+                         PixelRepresentation: 0
+                     SmallestImagePixelValue: 0
+                      LargestImagePixelValue: {45x1 cell}
+                                WindowCenter: {45x1 cell}
+                                 WindowWidth: {45x1 cell}
+                WindowCenterWidthExplanation: 'Algo1'
+             PerformedProcedureStepStartDate: '20190430'
+             PerformedProcedureStepStartTime: '162001.903000'
+                    PerformedProcedureStepID: 'MR20190430162001'
+           PerformedProcedureStepDescription: 'Volunteer_TC'
+            CommentsOnPerformedProcedureStep: ''
+                      DataSetTrailingPadding: {45x1 cell}
+                               InversionTime: 0
+    ReferencedPerformedProcedureStepSequence: []
+                       DateOfLastCalibration: []
+                       TimeOfLastCalibration: []
+               PerformedProtocolCodeSequence: []
+                                   ValueType: []
+                     ConceptNameCodeSequence: []
+                         ContinuityOfContent: []
+              PerformedProcedureCodeSequence: []
+                              CompletionFlag: []
+                            VerificationFlag: []
+                     ContentTemplateSequence: []
+                             ContentSequence: []
+                                     DENSEid: 'mag.overall'
+                                  DENSEindex: {45x1 cell}
+                                   DENSEdata: [1x1 struct]
+                            NumberInSequence: 45
+                         MultipleValueFields: {14x1 cell}
+                               ValidSequence: 1
+                                     sliceid: 8
+                                     planeid: 1
+                                  parallelid: 1
+                                   extents2D: [4x2 double]
+                                   extents3D: [4x3 double]
+                                       tform: [1x1 struct]
+                           DENSEanalysisName: 'DENSE_OVS_4chamber_AveMag'

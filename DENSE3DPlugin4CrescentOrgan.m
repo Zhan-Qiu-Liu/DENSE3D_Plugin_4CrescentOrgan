@@ -65,6 +65,7 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI', 'Callback', @(s,e)imageryROI(self,false));
 			uimenu('Parent', self.handles.menu_append, 'Label', 'Imagery of ROI-Data', 'Callback', @(s,e)imageryROI(self,true));
 			uimenu('Parent', self.handles.menu_append, 'Label', 'merge DNS files', 'Callback', @mergeDNS);
+			uimenu('Parent', self.handles.menu_append, 'Label', 'copy ROIs', 'Callback', @copyDNS);
 
 			%% Remap for all click events
             % set(findobj(handles.hfig, 'tag', 'menu_runanalysis'), 'Callback', @(s,e)menu_runanalysis_REPL(self));
@@ -622,8 +623,16 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 			% self.hdata = handles.hdata;
 			
 			% self.spl = handles.hdata.analysis(didx,ridx,frame);
+			
 			analysisFcnREPL(self,handles.hdata,didx,ridx,frame);
 			if isempty(self.spl), return; end
+			
+			button = questdlg('Do you wanna plot the 2D result?','No');
+			if strcmpi(button,'Yes')
+				handles.hdata.spl = self.spl;		
+				notify(handles.hdata,'NewState',DENSEEventData('new','spl'));
+			end
+			
 			%{ 
 			if isempty(self.status.nSA)
 				for k = 1:numel(handles.hdata.dns)
@@ -690,13 +699,23 @@ classdef DENSE3DPlugin4CrescentOrgan < plugins.DENSEanalysisPlugin
 					file = fullfile(defaultpath, defaultfile);
 					tmp = load(file, '-mat');
 					tmp.AnalysisInfo.Nseg = self.straindata.Nseg;
-					 %}
+					%}
+					if strcmpi(button,'Yes')
+						handles.hanalysis.straindata = data;
+						%{ 
+						handles.hanalysis.straindata.PositionA = data.PositionA;
+						handles.hanalysis.straindata.PositionB = data.PositionB;
+						handles.hanalysis.straindata.Clockwise = data.Clockwise;
+						handles.hanalysis.straindata.Nmodel = data.Nmodel;
+						handles.hanalysis.straindata.Nseg = 6;
+						%}
+						handles.hsidebar.ActiveTab = 3;
+					end
 				end
-				if isempty(file)
+				if ~isempty(file)
 				% if isempty(handles.hanalysis.straindata)
-					return;
+					handles.config.export.mat.location = fileparts(file);
 				end
-				handles.config.export.mat.location = fileparts(file);
 
 				%{ 
 				% self.dns(didx).SegPos = handles.hanalysis.straindata.PositionB;
