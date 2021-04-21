@@ -1,7 +1,7 @@
 ## 3D DENSE Plugin for Crescent Organ
 [*DENSEanalysis*](https://github.com/denseanalysis/denseanalysis) Affiliate Plugin for 3D Finite Element Meshing, Deformation Visualization, and Biomechanics Quantification of a Crescent-Shaped Organ from Cine **d**isplacement **en**coding with **s**timulated **e**choes (DENSE) MRI Images
-![Screenshot](screenshot.jpg)
 ![Animation](animation.gif)
+![Screenshot](screenshot.jpg)
 
 ### Applications
 - Right ventricle of small animals like rodent, which have a much more crescent-shaped cavity
